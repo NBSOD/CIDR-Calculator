@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPv4 反掩码计算器</title>
+    <style>
+        /* ===== 全局 & 主题 ===== */
+        :root {
+            --bg-page: #f0f2f5;
+            --bg-card: #fff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #4f46e5;
+            --accent-light: #e0e7ff;
+            --accent-text: #4338ca;
+            --success-bg: #ccfbf1;
+            --success-text: #0f766e;
+            --error-bg: #fee2e2;
+            --error-text: #b91c1c;
+            --code-bg: #f1f5f9;
+            --table-header: #f8fafc;
+            --table-border: #edf2f7;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --badge-warn-bg: #fef9c3;
+            --badge-warn-text: #a16207;
+            --preset-bg: #f1f5f9;
+            --preset-hover: #e2e8f0;
+            --binary-bg: #f8fafc;
+            --binary-border: #e2e8f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-page: #0f172a;
+                --bg-card: #1e293b;
+                --text-primary: #e2e8f0;
+                --text-secondary: #94a3b8;
+                --text-muted: #64748b;
+                --border: #334155;
+                --accent: #818cf8;
+                --accent-light: #1e1b4b;
+                --accent-text: #a5b4fc;
+                --success-bg: #064e3b;
+                --success-text: #6ee7b7;
+                --error-bg: #450a0a;
+                --error-text: #fca5a5;
+                --code-bg: #0f172a;
+                --table-header: #1e293b;
+                --table-border: #334155;
+                --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                --badge-warn-bg: #713f12;
+                --badge-warn-text: #fde047;
+                --preset-bg: #334155;
+                --preset-hover: #475569;
+                --binary-bg: #0f172a;
+                --binary-border: #334155;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-page);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .header {
+            background: var(--accent);
+            color: #fff;
+            padding: 20px 24px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 6px 0 0 0;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .section {
+            padding: 20px 24px;
+        }
+        .section + .section {
+            border-top: 1px solid var(--border);
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .input-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            font-size: 16px;
+            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: border-color 0.15s, background 0.2s, color 0.2s;
+        }
+        .input-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 4px;
+            white-space: nowrap;
+            background: var(--accent-light);
+            color: var(--accent-text);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .error-msg {
+            display: none;
+            color: var(--error-text);
+            font-size: 13px;
+            margin-top: 8px;
+            background: var(--error-bg);
+            padding: 10px 12px;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+
+        /* ===== 快速预设 ===== */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .presets button {
+            padding: 5px 12px;
+            font-size: 12px;
+            font-family: monospace;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--preset-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .presets button:hover {
+            background: var(--preset-hover);
+            color: var(--text-primary);
+            border-color: var(--accent);
+        }
+
+        /* ===== 结果表格 ===== */
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            text-align: left;
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--table-border);
+        }
+        th {
+            background: var(--table-header);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 13px;
+        }
+        td code {
+            background: var(--code-bg);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            word-break: break-all;
+            transition: background 0.2s, color 0.2s;
+        }
+        td:last-child {
+            text-align: right;
+            width: 70px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .copy-btn:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+        .copy-btn.copied {
+            color: #16a34a;
+            border-color: #16a34a;
+        }
+        @media (prefers-color-scheme: dark) {
+            .copy-btn.copied { color: #6ee7b7; border-color: #6ee7b7; }
+        }
+
+        /* ===== 二进制展开 ===== */
+        .binary-section {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: var(--binary-bg);
+            border: 1px solid var(--binary-border);
+            border-radius: 6px;
+            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            transition: background 0.2s, border-color 0.2s;
+            overflow-x: auto;
+        }
+        .binary-section .bin-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .binary-section .bin-label {
+            display: inline-block;
+            min-width: 72px;
+            color: var(--text-muted);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .binary-section .bin-value {
+            color: var(--text-primary);
+        }
+        .binary-section .bin-dot {
+            color: var(--text-muted);
+        }
+        .bin-1 { color: var(--accent); font-weight: 600; }
+        .bin-0 { color: var(--text-muted); }
+        .bin-wild-1 { color: #0891b2; font-weight: 600; }
+        .bin-wild-0 { color: var(--text-muted); }
+
+        .binary-section .sep {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border);
+        }
+        .binary-section .legend {
+            display: flex;
+            gap: 14px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .binary-section .legend span { display: flex; align-items: center; gap: 4px; }
+        .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 500px) {
+            body { padding: 12px; }
+            .section { padding: 16px; }
+            .header { padding: 16px; }
+            .header h1 { font-size: 17px; }
+            .input-row { flex-direction: column; align-items: stretch; }
+            .input-row input { min-width: 0; }
+            .badge { align-self: flex-start; }
+            th, td { padding: 9px 8px; font-size: 13px; }
+            td code { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>IPv4 反掩码计算器</h1>
+            <p>支持 CIDR（192.168.10.0/23）、IP+掩码（192.168.136.0 255.255.252.0）、单主机</p>
+        </div>
+
+        <div class="section">
+            <label for="calcInput">输入网络 / 主机地址及掩码</label>
+            <div class="input-row">
+                <input type="text" id="calcInput" value="192.168.10.0/23"
+                       placeholder="例如 192.168.10.0/23"
+                       autocomplete="off" spellcheck="false">
+                <span id="formatBadge" class="badge">正在初始化…</span>
+            </div>
+            <div id="inputError" class="error-msg"></div>
+
+            <div class="presets">
+                <button type="button" data-value="0.0.0.0/0">0.0.0.0/0</button>
+                <button type="button" data-value="10.0.0.0/8">10.0.0.0/8</button>
+                <button type="button" data-value="172.16.0.0/12">172.16.0.0/12</button>
+                <button type="button" data-value="192.168.0.0/16">192.168.0.0/16</button>
+                <button type="button" data-value="192.168.1.0/24">192.168.1.0/24</button>
+                <button type="button" data-value="192.168.10.0/23">192.168.10.0/23</button>
+                <button type="button" data-value="10.1.1.1 255.255.255.0">10.1.1.1 + 掩码</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 600;">计算结果</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 34%;">计算条目</th>
+                            <th style="width: 48%;">对应数值</th>
+                            <th style="width: 18%;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsContainer">
+                        <tr><td colspan="3" class="empty-state">等待输入…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 二进制展开 -->
+            <div id="binarySection" class="binary-section" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // ===== 工具函数 =====
+
+        function isValidIp(ip) {
+            return /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip);
+        }
+
+        function ipToLong(ip) {
+            const parts = ip.split('.');
+            return ((+parts[0] << 24) | (+parts[1] << 16) | (+parts[2] << 8) | +parts[3]) >>> 0;
+        }
+
+        function longToIp(n) {
+            return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+        }
+
+        function cidrToLongMask(cidr) {
+            return cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
+        }
+
+        function longMaskToCidr(mask) {
+            const bin = mask.toString(2).padStart(32, '0');
+            const firstZero = bin.indexOf('0');
+            const lastOne = bin.lastIndexOf('1');
+            if (firstZero !== -1 && lastOne > firstZero) return -1; // 非连续掩码
+            return (bin.match(/1/g) || []).length;
+        }
+
+        function toBinaryOctets(n) {
+            const octets = [];
+            for (let i = 0; i < 4; i++) {
+                octets.push(((n >>> (24 - i * 8)) & 255).toString(2).padStart(8, '0'));
+            }
+            return octets;
+        }
+
+        // ===== DOM 引用 =====
+
+        const $input      = document.getElementById('calcInput');
+        const $badge      = document.getElementById('formatBadge');
+        const $error      = document.getElementById('inputError');
+        const $container  = document.getElementById('resultsContainer');
+        const $binary     = document.getElementById('binarySection');
+
+        // ===== 核心逻辑 =====
+
+        function processInput() {
+            $error.style.display = 'none';
+
+            const raw = $input.value.trim().replace(/\s+/g, ' ');
+
+            // 空输入
+            if (!raw) {
+                renderEmpty();
+                $badge.textContent = '等待输入';
+                $badge.style.cssText = '';
+                $binary.style.display = 'none';
+                return;
+            }
+
+            let ipStr = '';
+            let maskNum = 0;
+            let cidr = 0;
+            let matched = false;
+
+            // 1. CIDR 格式
+            if (raw.includes('/')) {
+                const parts = raw.split('/');
+                const ip = parts[0].trim();
+                const cidrStr = parts[1].trim();
+                if (isValidIp(ip) && cidrStr !== '' && !isNaN(cidrStr)) {
+                    const c = parseInt(cidrStr, 10);
+                    if (c >= 0 && c <= 32) {
+                        ipStr = ip;
+                        cidr = c;
+                        maskNum = cidrToLongMask(cidr);
+                        $badge.textContent = 'CIDR /' + cidr;
+                        $badge.style.cssText = '';
+                        matched = true;
+                    }
+                }
+            }
+            // 2. IP + 掩码
+            else if (raw.includes(' ')) {
+                const parts = raw.split(' ');
+                const ip = parts[0].trim();
+                const mask = parts[1].trim();
+                if (isValidIp(ip) && isValidIp(mask)) {
+                    ipStr = ip;
+                    maskNum = ipToLong(mask);
+                    cidr = longMaskToCidr(maskNum);
+                    if (cidr === -1) {
+                        $badge.textContent = '⚠ 非连续掩码';
+                        $badge.style.background = 'var(--badge-warn-bg)';
+                        $badge.style.color   = 'var(--badge-warn-text)';
+                    } else {
+                        $badge.textContent = '掩码 /' + cidr;
+                        $badge.style.background = 'var(--success-bg)';
+                        $badge.style.color   = 'var(--success-text)';
+                    }
+                    matched = true;
+                }
+            }
+            // 3. 纯 IP
+            else if (isValidIp(raw)) {
+                ipStr = raw;
+                cidr = 32;
+                maskNum = cidrToLongMask(32);
+                $badge.textContent = '主机 /32';
+                $badge.style.cssText = '';
+                matched = true;
+            }
+
+            if (matched) {
+                renderResults(ipStr, maskNum, cidr);
+            } else {
+                // 输入长度 > 4 才报错（避免刚输入一个字符就弹红）
+                if (raw.length > 4) {
+                    $error.style.display = 'block';
+                    $error.textContent = '⚠ 输入格式有误。请使用 CIDR（如 192.168.10.0/23）或 IP+掩码（如 192.168.10.0 255.255.255.0）';
+                    $badge.textContent = '无法识别';
+                    $badge.style.background = 'var(--error-bg)';
+                    $badge.style.color   = 'var(--error-text)';
+                }
+                $binary.style.display = 'none';
+            }
+        }
+
+        function renderResults(ipStr, maskNum, cidr) {
+            const ipNum = ipToLong(ipStr);
+            const wildcardNum = (~maskNum) >>> 0;
+            const networkNum = (ipNum & maskNum) >>> 0;
+            const broadcastNum = (networkNum | wildcardNum) >>> 0;
+
+            let usableHosts, hostRange;
+
+            if (cidr === 32) {
+                usableHosts = 1;
+                hostRange = longToIp(networkNum) + '（单主机）';
+            } else if (cidr === 31) {
+                usableHosts = 2;
+                hostRange = longToIp(networkNum) + ' — ' + longToIp(broadcastNum);
+            } else if (cidr >= 0 && cidr <= 30) {
+                usableHosts = Math.pow(2, 32 - cidr) - 2;
+                hostRange = longToIp(networkNum + 1) + ' — ' + longToIp(broadcastNum - 1);
+            } else {
+                // 非连续掩码
+                usableHosts = 'N/A';
+                hostRange = '非连续掩码，无法确定';
+            }
+
+            const acl = 'permit ' + longToIp(networkNum) + ' ' + longToIp(wildcardNum);
+
+            const rows = [
+                { label: '分析 IP 地址',          value: ipStr },
+                { label: '子网掩码（Subnet Mask）',  value: longToIp(maskNum) },
+                { label: '反掩码（Wildcard Mask）',  value: longToIp(wildcardNum) },
+                { label: '网络地址（Network ID）',   value: longToIp(networkNum) },
+                { label: '广播地址（Broadcast）',    value: longToIp(broadcastNum) },
+                { label: '可用主机范围',            value: hostRange },
+                { label: '可用主机总数',            value: typeof usableHosts === 'number' ? usableHosts.toLocaleString() : usableHosts },
+                { label: 'Cisco ACL 参考',          value: acl },
+            ];
+
+            // 渲染表格
+            $container.innerHTML = '';
+            for (const row of rows) {
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + escHtml(row.label) + '</td>' +
+                    '<td><code>' + escHtml(row.value) + '</code></td>' +
+                    '<td><button class="copy-btn" data-copy="' + escAttr(row.value) + '">复制</button></td>';
+                $container.appendChild(tr);
+            }
+
+            // 绑定复制按钮
+            $container.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    copyText(this.getAttribute('data-copy'), this);
+                });
+            });
+
+            // 二进制展开
+            renderBinary(ipNum, maskNum, wildcardNum, networkNum, broadcastNum, cidr);
+        }
+
+        function renderBinary(ipNum, maskNum, wildcardNum, networkNum, broadcastNum, cidr) {
+            const ipOct = toBinaryOctets(ipNum);
+            const mkOct = toBinaryOctets(maskNum);
+            const wcOct = toBinaryOctets(wildcardNum);
+            const nwOct = toBinaryOctets(networkNum);
+            const bcOct = toBinaryOctets(broadcastNum);
+
+            function colorizeBin(octets, clsOne, clsZero) {
+                return octets.map(oct =>
+                    [...oct].map(b => `<span class="${b === '1' ? clsOne : clsZero}">${b}</span>`).join('')
+                ).join('<span class="bin-dot">.</span>');
+            }
+
+            const ipBin   = colorizeBin(ipOct, 'bin-1', 'bin-0');
+            const mkBin   = colorizeBin(mkOct, 'bin-1', 'bin-0');
+            const wcBin   = colorizeBin(wcOct, 'bin-wild-1', 'bin-wild-0');
+            const nwBin   = colorizeBin(nwOct, 'bin-1', 'bin-0');
+            const bcBin   = colorizeBin(bcOct, 'bin-1', 'bin-0');
+
+            const cidrLabel = cidr >= 0 && cidr <= 32 ? '  (/' + cidr + ')' : '';
+
+            $binary.innerHTML =
+                '<div class="bin-row"><span class="bin-label">IP</span>'        + '<span class="bin-value">' + ipBin + '</span></div>' +
+                '<div class="bin-row"><span class="bin-label">掩码</span>'       + '<span class="bin-value">' + mkBin + cidrLabel + '</span></div>' +
+                '<div class="bin-row"><span class="bin-label">反掩码</span>'     + '<span class="bin-value">' + wcBin + '</span></div>' +
+                '<div class="bin-row sep"><span class="bin-label">网络地址</span>' + '<span class="bin-value">' + nwBin + '</span></div>' +
+                '<div class="bin-row"><span class="bin-label">广播地址</span>'    + '<span class="bin-value">' + bcBin + '</span></div>' +
+                '<div class="legend">' +
+                    '<span><span class="legend-dot" style="background:var(--accent);"></span> 网络位（1）</span>' +
+                    '<span><span class="legend-dot" style="background:var(--text-muted);"></span> 主机位（0）</span>' +
+                    '<span><span class="legend-dot" style="background:#0891b2;"></span> 反掩码 1</span>' +
+                '</div>';
+
+            $binary.style.display = '';
+        }
+
+        function renderEmpty() {
+            $container.innerHTML = '<tr><td colspan="3" class="empty-state">输入 IP 地址后自动计算结果</td></tr>';
+            $binary.style.display = 'none';
+        }
+
+        // ===== 辅助：转义 =====
+
+        function escHtml(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        function escAttr(s) {
+            return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ===== 复制 =====
+
+        function copyText(text, btn) {
+            if (!navigator.clipboard) {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                flashCopied(btn);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => flashCopied(btn));
+        }
+
+        function flashCopied(btn) {
+            btn.textContent = '已复制';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = '复制';
+                btn.classList.remove('copied');
+            }, 1000);
+        }
+
+        // ===== 事件绑定 =====
+
+        // 输入实时计算
+        $input.addEventListener('input', processInput);
+
+        // 回车键
+        $input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processInput();
+            }
+        });
+
+        // 预设按钮
+        document.querySelectorAll('.presets button').forEach(btn => {
+            btn.addEventListener('click', function () {
+                $input.value = this.getAttribute('data-value');
+                processInput();
+                $input.focus();
+            });
+        });
+
+        // 初始计算
+        processInput();
+    </script>
+</body>
+</html>
