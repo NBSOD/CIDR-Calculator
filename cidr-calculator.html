@@ -3,412 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIDR 子网计算器</title>
+    <title>CIDR 子网计算器 - WebUI 3 Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Host+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ===== DeepSeek Harness 设计系统 — 样式参考 deepseek.com/harness ===== */
-
+        /* ===== WebUI 3 视觉设计系统 ===== */
         :root {
-            /* Static colors (same across themes) */
-            --ds-static-neutral-bluish-00: #fff;
-            --ds-static-neutral-bluish-50: #f9fafb;
-            --ds-static-neutral-bluish-60: #f9fafb;
-            --ds-static-neutral-bluish-75: #f1f3f5;
-            --ds-static-neutral-bluish-100: #ebeef2;
-            --ds-static-neutral-bluish-150: #e9ecf2;
-            --ds-static-neutral-bluish-200: #e1e5ee;
-            --ds-static-neutral-bluish-300: #cfd3d6;
-            --ds-static-neutral-bluish-400: #adb2b8;
-            --ds-static-neutral-bluish-500: #979da6;
-            --ds-static-neutral-bluish-600: #81858c;
-            --ds-static-neutral-bluish-700: #61666b;
-            --ds-static-neutral-bluish-750: #43454a;
-            --ds-static-neutral-bluish-800: #353638;
-            --ds-static-neutral-bluish-850: #2c2c2e;
-            --ds-static-neutral-bluish-875: #232324;
-            --ds-static-neutral-bluish-900: #1b1b1c;
-            --ds-static-neutral-bluish-950: #151517;
-            --ds-static-neutral-bluish-1000: #0f1115;
-            --ds-static-deepseek-50: #edf3fe;
-            --ds-static-deepseek-100: #e4edfd;
-            --ds-static-deepseek-200: #d3e2ff;
-            --ds-static-deepseek-300: #b7c8fe;
-            --ds-static-deepseek-400: #679efe;
-            --ds-static-deepseek-450: #5686fe;
-            --ds-static-deepseek-500: #4176e6;
-            --ds-static-deepseek-600: #4868b2;
-            --ds-static-deepseek-800: #34415b;
-            --ds-static-deepseek-900: #283142;
-            --ds-static-green-400: #4ed17e;
-            --ds-static-green-500: #22c55e;
-            --ds-static-red-400: #f25a5a;
-            --ds-static-red-500: #ef4444;
-            --ds-static-red-600: #ec1313;
-            --ds-static-amber-400: #f7ad31;
-            --ds-static-amber-500: #f59e0b;
-
-            /* Light theme aliases */
-            --ds-page: #f0f6ff;
-            --ds-surface-1: var(--ds-static-neutral-bluish-00);
-            --ds-surface-3: var(--ds-static-neutral-bluish-00);
-            --ds-primary: var(--ds-static-neutral-bluish-1000);
-            --ds-description: var(--ds-static-neutral-bluish-700);
-            --ds-secondary: var(--ds-static-neutral-bluish-600);
-            --ds-brand: var(--ds-static-deepseek-500);
-            --ds-brand-light: var(--ds-static-deepseek-100);
-            --ds-border-default: rgb(0 0 0 / 10%);
-            --ds-border-subtle: rgb(0 0 0 / 6%);
-            --ds-border-l2: rgb(0 0 0 / 6%);
-
-            /* Semantic aliases */
-            --success-bg: #ecfdf5;
-            --success-text: #059669;
-            --error-bg: #fef2f2;
-            --error-text: #dc2626;
-            --warn-bg: #fffbeb;
-            --warn-text: #d97706;
-            --code-bg: rgb(0 0 0 / 4%);
-            --table-header: rgb(0 0 0 / 2%);
-            --table-border: rgb(0 0 0 / 6%);
-            --preset-hover: rgb(0 0 0 / 8%);
-            --private-bg: #f5f3ff;
-            --private-text: #6d28d9;
-            --public-bg: #eff6ff;
-            --public-text: #2563eb;
-            --loopback-bg: #fdf2f8;
-            --loopback-text: #be185d;
-            --reserved-bg: #fef3c7;
-            --reserved-text: #b45309;
-            --multicast-bg: #f0fdf4;
-            --multicast-text: #16a34a;
-            --toast-bg: var(--ds-static-neutral-bluish-1000);
-            --toast-text: var(--ds-static-neutral-bluish-00);
-            --subnet-table-max: 360px;
-            --input-bg: var(--ds-static-neutral-bluish-00);
+            /* 基础色板 */
+            --brand-primary: #6366f1;
+            --brand-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --brand-glow: rgba(99, 102, 241, 0.25);
+            
+            /* 亮色模式 WebUI 3 变量 */
+            --page-bg: #f8fafc;
+            --bg-gradient: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                         radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+            
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 15px rgba(255, 255, 255, 0.5) inset;
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-subtle: #94a3b8;
+            
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --input-border: rgba(226, 232, 240, 0.8);
+            
+            --card-inner-bg: rgba(255, 255, 255, 0.4);
+            --table-hover: rgba(99, 102, 241, 0.03);
+            
+            /* 标签色彩 */
+            --badge-private-bg: rgba(168, 85, 247, 0.1);
+            --badge-private-text: #7e22ce;
+            --badge-public-bg: rgba(59, 130, 246, 0.1);
+            --badge-public-text: #1d4ed8;
+            --badge-reserved-bg: rgba(245, 158, 11, 0.1);
+            --badge-reserved-text: #b45309;
+            --badge-multicast-bg: rgba(16, 185, 129, 0.1);
+            --badge-multicast-text: #047857;
+            
+            --toast-bg: rgba(15, 23, 42, 0.9);
+            --toast-text: #ffffff;
         }
 
         body[data-ds-dark-theme] {
-            --ds-page: var(--ds-static-neutral-bluish-950);
-            --ds-surface-1: var(--ds-static-neutral-bluish-875);
-            --ds-surface-3: var(--ds-static-neutral-bluish-900);
-            --ds-primary: var(--ds-static-neutral-bluish-50);
-            --ds-description: var(--ds-static-neutral-bluish-300);
-            --ds-secondary: var(--ds-static-neutral-bluish-400);
-            --ds-brand: var(--ds-static-deepseek-400);
-            --ds-brand-light: var(--ds-static-deepseek-900);
-            --ds-border-default: rgb(255 255 255 / 10%);
-            --ds-border-subtle: rgb(255 255 255 / 6%);
-            --ds-border-l2: rgb(255 255 255 / 6%);
-            --success-bg: #052e16;
-            --success-text: #6ee7b7;
-            --error-bg: #450a0a;
-            --error-text: #fca5a5;
-            --warn-bg: #451a03;
-            --warn-text: #fcd34d;
-            --code-bg: rgb(255 255 255 / 6%);
-            --table-header: rgb(255 255 255 / 3%);
-            --table-border: rgb(255 255 255 / 6%);
-            --preset-hover: rgb(255 255 255 / 10%);
-            --private-bg: #2e1065;
-            --private-text: #c4b5fd;
-            --public-bg: #1e3a5f;
-            --public-text: #93c5fd;
-            --loopback-bg: #4a0e2e;
-            --loopback-text: #f9a8d4;
-            --reserved-bg: #451a03;
-            --reserved-text: #fcd34d;
-            --multicast-bg: #052e16;
-            --multicast-text: #6ee7b7;
-            --toast-bg: var(--ds-static-neutral-bluish-50);
-            --toast-text: var(--ds-static-neutral-bluish-1000);
-            --input-bg: var(--ds-static-neutral-bluish-875);
+            /* 暗色模式 WebUI 3 变量 */
+            --page-bg: #0b0f17;
+            --bg-gradient: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                         radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            
+            --glass-bg: rgba(18, 24, 38, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 1px 0px rgba(255, 255, 255, 0.1) inset;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.1);
+            
+            --card-inner-bg: rgba(255, 255, 255, 0.02);
+            --table-hover: rgba(255, 255, 255, 0.02);
+            
+            --badge-private-bg: rgba(168, 85, 247, 0.2);
+            --badge-private-text: #c084fc;
+            --badge-public-bg: rgba(59, 130, 246, 0.2);
+            --badge-public-text: #60a5fa;
+            --badge-reserved-bg: rgba(245, 158, 11, 0.2);
+            --badge-reserved-text: #fbbf24;
+            --badge-multicast-bg: rgba(16, 185, 129, 0.2);
+            --badge-multicast-text: #34d399;
+            
+            --toast-bg: rgba(255, 255, 255, 0.95);
+            --toast-text: #0f172a;
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background: var(--ds-page);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--page-bg);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
             margin: 0;
-            color: var(--ds-primary);
+            color: var(--text-main);
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background 0.2s, color 0.2s;
             min-height: 100vh;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         /* ===== Header Bar ===== */
-        .ds-header-wrapper {
+        .webui-header-wrapper {
             position: sticky;
             top: 0;
             z-index: 50;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            background: color-mix(in srgb, var(--ds-page) 80%, transparent);
-            border-bottom: 1px solid var(--ds-border-subtle);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: color-mix(in srgb, var(--page-bg) 60%, transparent);
+            border-bottom: 1px solid var(--glass-border);
         }
-        .ds-header-bar {
-            max-width: 1280px;
+        .webui-header-bar {
+            max-width: 900px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 24px;
-            height: 56px;
+            height: 64px;
         }
-        .ds-header-bar a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .webui-header-bar a {
             text-decoration: none;
-            color: var(--ds-primary);
-            min-width: 0;
+            color: var(--text-main);
         }
-        .ds-header-bar .ds-logo {
-            font-family: "Host Grotesk", "DM Sans", sans-serif;
+        .webui-logo {
             font-size: 18px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        .ds-header-bar .ds-logo .ds-brand-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            background: var(--ds-brand);
-        }
-        .ds-header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .webui-brand-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--brand-gradient);
+            box-shadow: 0 0 10px var(--brand-primary);
         }
 
         .theme-btn {
-            flex: none;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--ds-border-default);
-            border-radius: 18px;
-            background: transparent;
-            color: var(--ds-description);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            color: var(--text-main);
             cursor: pointer;
             font-size: 16px;
-            transition: background 0.15s, color 0.15s, border-color 0.15s;
-            padding: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--glass-shadow);
         }
         .theme-btn:hover {
-            background: var(--preset-hover);
-            color: var(--ds-primary);
-            border-color: var(--ds-border-default);
-        }
-        .theme-btn:focus-visible {
-            outline: 2px solid var(--ds-brand);
-            outline-offset: 2px;
-        }
-
-        /* ===== Result Badge ===== */
-        .result-badge {
-            display: inline-flex;
-            align-items: center;
-            height: 26px;
-            padding: 0 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 13px;
-            white-space: nowrap;
-            background: var(--ds-brand-light);
-            color: var(--ds-brand);
-            transition: background 0.2s, color 0.2s;
-            margin-left: 8px;
+            transform: translateY(-2px);
+            border-color: var(--brand-primary);
         }
 
         /* ===== Container ===== */
-        .ds-container {
-            max-width: 840px;
+        .webui-container {
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 24px 60px;
         }
 
         /* ===== Page Title ===== */
-        .ds-page-title {
-            padding: 40px 0 24px;
+        .webui-page-title {
+            padding: 40px 0 28px;
+            text-align: center;
         }
-        .ds-page-title h1 {
-            font-family: "Host Grotesk", "DM Sans", sans-serif;
-            font-size: 34px;
-            font-weight: 600;
+        .webui-page-title h1 {
+            font-size: 38px;
+            font-weight: 800;
             margin: 0;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
             line-height: 1.2;
-            color: var(--ds-primary);
         }
-        .ds-page-title .ds-brand-text {
-            color: var(--ds-brand);
+        .webui-gradient-text {
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .ds-page-title p {
-            margin: 12px 0 0;
+        .webui-page-title p {
+            margin: 10px 0 0;
             font-size: 15px;
-            line-height: 1.6;
-            color: var(--ds-description);
-            max-width: 640px;
+            color: var(--text-muted);
         }
 
-        /* ===== Section Cards ===== */
-        .ds-card {
-            background: var(--ds-surface-3);
-            border: 1px solid var(--ds-border-default);
-            border-radius: 12px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
+        /* ===== WebUI 3 Card ===== */
+        .webui-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        }
+        .webui-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
-        .ds-card-title {
+        .webui-card-title {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin: 0 0 16px;
+            gap: 10px;
+            margin: 0 0 20px;
             font-size: 16px;
-            font-weight: 600;
-            color: var(--ds-primary);
+            font-weight: 700;
+            color: var(--text-main);
         }
-        .ds-card-title svg {
-            flex-shrink: 0;
-            color: var(--ds-brand);
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 500;
-            display: block;
-            margin-bottom: 8px;
-            color: var(--ds-description);
+        .webui-card-title svg {
+            color: var(--brand-primary);
         }
 
         /* ===== Input ===== */
         .input-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
         }
         .input-wrap {
-            flex: 0 1 auto;
-            min-width: 220px;
-            max-width: 460px;
+            flex: 1;
+            min-width: 260px;
             position: relative;
         }
         .input-wrap input {
             width: 100%;
-            min-width: 220px;
-            padding: 12px 40px 12px 14px;
-            font-size: 16px;
-            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            border: 1px solid var(--ds-border-default);
-            border-radius: 8px;
+            padding: 14px 42px 14px 16px;
+            font-size: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            border: 1px solid var(--input-border);
+            border-radius: 14px;
             outline: none;
             background: var(--input-bg);
-            color: var(--ds-primary);
-            transition: border-color 0.15s, background 0.2s;
+            color: var(--text-main);
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         .input-wrap input:focus {
-            border-color: var(--ds-brand);
-        }
-        .input-wrap input::placeholder {
-            color: var(--ds-secondary);
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px var(--brand-glow);
         }
 
         .clear-btn {
             position: absolute;
-            right: 10px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            color: var(--ds-description);
-            padding: 2px 6px;
-            line-height: 1;
+            font-size: 14px;
+            color: var(--text-subtle);
+            padding: 4px;
             display: none;
-            border-radius: 4px;
+            border-radius: 50%;
             transition: color 0.15s, background 0.15s;
-            z-index: 2;
         }
         .clear-btn:hover {
-            color: var(--ds-primary);
-            background: var(--preset-hover);
+            color: var(--text-main);
+            background: rgba(150, 150, 150, 0.15);
         }
         .clear-btn.visible { display: block; }
 
-        /* ===== Format Badge ===== */
-        .format-badge {
+        /* ===== Format & Result Badges ===== */
+        .format-badge, .result-badge {
             display: inline-flex;
             align-items: center;
-            height: 32px;
-            padding: 0 14px;
+            height: 36px;
+            padding: 0 16px;
             font-size: 13px;
             font-weight: 600;
-            border-radius: 16px;
+            border-radius: 18px;
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--brand-primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             white-space: nowrap;
-            background: var(--ds-brand-light);
-            color: var(--ds-brand);
-            transition: background 0.2s, color 0.2s;
+            transition: all 0.2s ease;
+        }
+        .result-badge {
+            height: 26px;
+            padding: 0 12px;
+            font-size: 12px;
+            margin-left: auto;
         }
 
         .error-msg {
             display: none;
-            color: var(--error-text);
-            font-size: 14px;
-            line-height: 1.5;
-            margin-top: 10px;
-            background: var(--error-bg);
-            padding: 11px 14px;
-            border-radius: 8px;
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 10px 14px;
+            border-radius: 12px;
         }
 
         /* ===== Quick Presets ===== */
         .presets {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 14px;
+            gap: 8px;
+            margin-top: 18px;
         }
         .presets button {
             display: inline-flex;
             align-items: center;
-            height: 30px;
+            height: 32px;
             padding: 0 14px;
-            font-size: 13px;
-            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, monospace;
-            border: 1px solid var(--ds-border-default);
-            border-radius: 15px;
-            background: transparent;
-            color: var(--ds-description);
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            border: 1px solid var(--input-border);
+            border-radius: 20px;
+            background: var(--input-bg);
+            color: var(--text-muted);
             cursor: pointer;
-            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            transition: all 0.2s ease;
         }
         .presets button:hover {
-            background: var(--preset-hover);
-            color: var(--ds-primary);
-        }
-        .presets button:focus-visible {
-            outline: 2px solid var(--ds-brand);
-            outline-offset: 2px;
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            transform: translateY(-1px);
         }
 
         /* ===== Results Table ===== */
         .table-wrap {
             overflow-x: auto;
-            border: 1px solid var(--ds-border-l2);
-            border-radius: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-inner-bg);
         }
         table {
             width: 100%;
@@ -417,253 +341,234 @@
         }
         th, td {
             text-align: left;
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--table-border);
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--glass-border);
         }
         th {
-            background: var(--table-header);
-            color: var(--ds-description);
+            background: rgba(150, 150, 150, 0.03);
+            color: var(--text-muted);
             font-weight: 600;
             font-size: 13px;
-            letter-spacing: 0.02em;
         }
         tr:last-child td { border-bottom: none; }
+        tr:hover td {
+            background: var(--table-hover);
+        }
         td code {
-            background: var(--code-bg);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            font-size: 14px;
-            color: var(--ds-primary);
-            word-break: break-all;
-            transition: background 0.2s;
+            background: rgba(99, 102, 241, 0.08);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13.5px;
+            color: var(--text-main);
         }
         td:last-child {
             text-align: right;
-            width: 72px;
+            width: 80px;
         }
 
         .copy-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: none;
-            border: 1px solid transparent;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            color: var(--ds-brand);
-            padding: 4px 10px;
-            border-radius: 14px;
-            transition: background 0.15s, color 0.15s;
-            height: 28px;
+            color: var(--brand-primary);
+            padding: 4px 12px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            height: 30px;
         }
         .copy-btn:hover {
-            background: var(--ds-brand-light);
-            color: var(--ds-brand);
-        }
-        .copy-btn:focus-visible {
-            outline: 2px solid var(--ds-brand);
-            outline-offset: 2px;
+            background: var(--brand-primary);
+            color: #fff;
+            transform: scale(1.05);
         }
 
         /* ===== IP Classification Tags ===== */
         .ip-class {
             display: inline-flex;
             align-items: center;
-            height: 24px;
+            height: 22px;
             padding: 0 10px;
-            border-radius: 12px;
-            font-size: 12px;
+            border-radius: 11px;
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.02em;
+            margin-left: 8px;
         }
-        .ip-class.private    { background: var(--private-bg); color: var(--private-text); }
-        .ip-class.public     { background: var(--public-bg); color: var(--public-text); }
-        .ip-class.loopback   { background: var(--loopback-bg); color: var(--loopback-text); }
-        .ip-class.reserved   { background: var(--reserved-bg); color: var(--reserved-text); }
-        .ip-class.link-local { background: var(--reserved-bg); color: var(--reserved-text); }
-        .ip-class.multicast  { background: var(--multicast-bg); color: var(--multicast-text); }
+        .ip-class.private    { background: var(--badge-private-bg); color: var(--badge-private-text); }
+        .ip-class.public     { background: var(--badge-public-bg); color: var(--badge-public-text); }
+        .ip-class.loopback   { background: var(--badge-private-bg); color: var(--badge-private-text); }
+        .ip-class.reserved   { background: var(--badge-reserved-bg); color: var(--badge-reserved-text); }
+        .ip-class.link-local { background: var(--badge-reserved-bg); color: var(--badge-reserved-text); }
+        .ip-class.multicast  { background: var(--badge-multicast-bg); color: var(--badge-multicast-text); }
 
         /* ===== Subnet Splitter ===== */
         .subnet-splitter {
-            margin-top: 16px;
+            margin-top: 24px;
             display: none;
+            border-top: 1px dashed var(--glass-border);
+            padding-top: 20px;
         }
         .subnet-splitter.visible { display: block; }
         .subnet-splitter .split-header {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .subnet-splitter .split-header label {
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 0;
+            color: var(--text-main);
         }
         .subnet-splitter select {
-            height: 30px;
-            padding: 0 14px;
-            font-size: 14px;
-            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, monospace;
-            border: 1px solid var(--ds-border-default);
-            border-radius: 15px;
+            height: 34px;
+            padding: 0 16px;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--input-border);
+            border-radius: 17px;
             background: var(--input-bg);
-            color: var(--ds-primary);
+            color: var(--text-main);
             cursor: pointer;
             outline: none;
-            transition: border-color 0.15s;
+            transition: border-color 0.2s ease;
         }
-        .subnet-splitter select:focus { border-color: var(--ds-brand); }
+        .subnet-splitter select:focus { border-color: var(--brand-primary); }
         .subnet-splitter .split-count {
             font-size: 13px;
-            color: var(--ds-description);
+            color: var(--text-muted);
+            margin-left: auto;
         }
-        .subnet-splitter .split-count strong { color: var(--ds-primary); }
         .subnet-splitter .split-warning {
             font-size: 13px;
-            color: var(--warn-text);
-            background: var(--warn-bg);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 14px;
         }
         .subnet-splitter .subnet-table-wrap {
-            max-height: var(--subnet-table-max);
+            max-height: 360px;
             overflow-y: auto;
-            border: 1px solid var(--ds-border-l2);
-            border-radius: 8px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-inner-bg);
         }
         .subnet-splitter .subnet-table-wrap table { font-size: 13px; }
         .subnet-splitter .subnet-table-wrap th {
             position: sticky;
             top: 0;
             z-index: 1;
+            backdrop-filter: blur(8px);
         }
         .subnet-splitter .subnet-table-wrap th,
         .subnet-splitter .subnet-table-wrap td {
-            padding: 7px 10px;
+            padding: 10px 14px;
             white-space: nowrap;
-        }
-        .subnet-splitter .subnet-table-wrap th:first-child,
-        .subnet-splitter .subnet-table-wrap td:first-child {
-            width: 36px;
-            text-align: center;
-        }
-        .subnet-splitter .subnet-table-wrap td code {
-            font-size: 13px;
-            padding: 2px 6px;
         }
 
         /* ===== Empty State ===== */
         .empty-state {
             text-align: center;
-            padding: 48px 16px;
-            color: var(--ds-description);
-            font-size: 15px;
+            padding: 40px 16px;
+            color: var(--text-subtle);
+            font-size: 14px;
         }
 
         /* ===== Toast ===== */
         .toast-container {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 30px;
+            right: 30px;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             pointer-events: none;
         }
         .toast {
             background: var(--toast-bg);
             color: var(--toast-text);
-            padding: 11px 20px;
-            border-radius: 8px;
+            padding: 12px 22px;
+            border-radius: 16px;
             font-size: 14px;
-            font-weight: 500;
-            line-height: 1.5;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            animation: toast-in 0.2s ease, toast-out 0.25s ease 2s forwards;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            animation: toast-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), toast-out 0.25s ease 2s forwards;
             pointer-events: auto;
-            max-width: 380px;
         }
         @keyframes toast-in {
-            from { opacity: 0; transform: translateY(8px) scale(0.97); }
+            from { opacity: 0; transform: translateY(16px) scale(0.9); }
             to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes toast-out {
             from { opacity: 1; transform: translateY(0) scale(1); }
-            to   { opacity: 0; transform: translateY(-4px) scale(0.97); }
+            to   { opacity: 0; transform: translateY(-10px) scale(0.9); }
         }
 
-        /* ===== Responsive ===== */
         @media (max-width: 640px) {
-            .ds-header-bar { padding: 0 16px; }
-            .ds-container { padding: 0 16px; }
-            .ds-page-title { padding: 24px 0 16px; }
-            .ds-page-title h1 { font-size: 26px; }
-            .ds-card { padding: 20px; border-radius: 8px; }
+            .webui-page-title h1 { font-size: 28px; }
+            .webui-card { padding: 20px; border-radius: 18px; }
             .input-row { flex-direction: column; align-items: stretch; }
-            .input-wrap { min-width: 0; }
             .format-badge { align-self: flex-start; }
-            th, td { padding: 10px 10px; font-size: 13px; }
-            td code { font-size: 13px; }
-            .toast-container { bottom: 12px; right: 12px; left: 12px; }
-            .toast { max-width: 100%; }
-            
+            .toast-container { bottom: 16px; right: 16px; left: 16px; }
         }
     </style>
 </head>
 <body>
 
     <!-- ===== Header ===== -->
-    <div class="ds-header-wrapper">
-        <div class="ds-header-bar">
+    <div class="webui-header-wrapper">
+        <div class="webui-header-bar">
             <a href="/">
-                <span class="ds-logo">
-                    <span class="ds-brand-dot"></span>
+                <span class="webui-logo">
+                    <span class="webui-brand-dot"></span>
                     CIDR 计算器
                 </span>
             </a>
-            <div class="ds-header-actions">
-                <button id="themeToggle" class="theme-btn" aria-label="切换主题" title="切换主题">☀️</button>
+            <div>
+                <button id="themeToggle" class="theme-btn" aria-label="切换主题">☀️</button>
             </div>
         </div>
     </div>
 
     <!-- ===== Main Content ===== -->
-    <div class="ds-container" role="application" aria-label="IPv4 CIDR 子网计算器">
+    <div class="webui-container" role="application" aria-label="IPv4 CIDR 子网计算器">
 
         <!-- Page Title -->
-        <div class="ds-page-title">
-            <h1>
-                <span class="ds-brand-text">IPv4</span> CIDR 子网计算器
-            </h1>
+        <div class="webui-page-title">
+            <h1><span class="webui-gradient-text">IPv4</span> CIDR 计算器</h1>
+            <p>基于 WebUI 3 视觉架构的现代子网划分与 IP 分析工具</p>
         </div>
 
         <!-- Input Card -->
-        <div class="ds-card">
-            <div class="ds-card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="webui-card">
+            <div class="webui-card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
-                输入网络 / 主机地址及掩码
+                网络 / 主机地址配置
             </div>
             <div class="input-row">
                 <div class="input-wrap">
                     <input type="text" id="calcInput" value="192.168.10.0/23"
                            placeholder="例如 192.168.10.0/23"
-                           autocomplete="off" spellcheck="false"
-                           aria-describedby="formatBadge inputError">
-                    <button id="clearBtn" class="clear-btn" aria-label="清空输入" tabindex="-1">✕</button>
+                           autocomplete="off" spellcheck="false">
+                    <button id="clearBtn" class="clear-btn" aria-label="清空输入">✕</button>
                 </div>
-                <span id="formatBadge" class="format-badge" role="status" aria-live="polite">正在初始化…</span>
+                <span id="formatBadge" class="format-badge">正在初始化…</span>
             </div>
-            <div id="inputError" class="error-msg" role="alert"></div>
+            <div id="inputError" class="error-msg"></div>
 
-            <div class="presets" role="group" aria-label="快速预设">
+            <div class="presets">
                 <button type="button" data-value="0.0.0.0/0">0.0.0.0/0</button>
                 <button type="button" data-value="10.0.0.0/8">10.0.0.0/8</button>
                 <button type="button" data-value="172.16.0.0/12">172.16.0.0/12</button>
@@ -675,16 +580,16 @@
         </div>
 
         <!-- Results Card -->
-        <div class="ds-card">
-            <div class="ds-card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="webui-card">
+            <div class="webui-card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                 </svg>
-                计算结果
+                计算分析结果
                 <span id="resultBadge" class="result-badge" style="display:none;">CIDR</span>
             </div>
             <div class="table-wrap">
-                <table aria-label="子网计算详情">
+                <table>
                     <thead>
                         <tr>
                             <th style="width: 34%;">计算条目</th>
@@ -692,14 +597,14 @@
                             <th style="width: 18%;">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="resultsContainer" aria-live="polite" aria-relevant="additions">
+                    <tbody id="resultsContainer">
                         <tr><td colspan="3" class="empty-state">等待输入…</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Subnet Splitter -->
-            <div id="subnetSplitter" class="subnet-splitter" role="region" aria-label="子网拆分">
+            <div id="subnetSplitter" class="subnet-splitter">
                 <div class="split-header">
                     <label for="subnetSelect">子网拆分 · 目标掩码长度</label>
                     <select id="subnetSelect"></select>
@@ -707,7 +612,7 @@
                 </div>
                 <div id="splitWarning" class="split-warning" style="display:none;"></div>
                 <div class="subnet-table-wrap">
-                    <table aria-label="子网列表">
+                    <table>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -724,32 +629,30 @@
             </div>
         </div>
 
-        </div>
+    </div>
 
     <!-- ===== Toast ===== -->
-    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+    <div id="toastContainer" class="toast-container"></div>
 
     <script>
         'use strict';
 
-        // ===== Theme =====
-
+        // ===== Theme Logic =====
         const $themeBtn = document.getElementById('themeToggle');
 
         function getSystemDark() {
             return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         function getStoredTheme() {
-            try { return localStorage.getItem('dsh-cidr-theme'); } catch { return null; }
+            try { return localStorage.getItem('webui3-cidr-theme'); } catch { return null; }
         }
         function setStoredTheme(v) {
-            try { if (v) localStorage.setItem('dsh-cidr-theme', v); else localStorage.removeItem('dsh-cidr-theme'); } catch {}
+            try { if (v) localStorage.setItem('webui3-cidr-theme', v); else localStorage.removeItem('webui3-cidr-theme'); } catch {}
         }
         function applyTheme(dark) {
             document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
             document.body.toggleAttribute('data-ds-dark-theme', dark);
             $themeBtn.textContent = dark ? '☀️' : '🌙';
-            $themeBtn.setAttribute('aria-label', dark ? '切换到亮色主题' : '切换到暗色主题');
         }
         function resolveTheme() {
             const stored = getStoredTheme();
@@ -764,14 +667,9 @@
             setStoredTheme(!isDark ? 'dark' : 'light');
         });
 
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
-            if (!getStoredTheme()) applyTheme(e.matches);
-        });
-
         applyTheme(resolveTheme());
 
-        // ===== Utilities =====
-
+        // ===== Calculator Logic Utilities =====
         function isValidIp(ip) {
             return /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip);
         }
@@ -797,7 +695,6 @@
         }
 
         // ===== IP Classification =====
-
         function classifyIp(ipNum) {
             if ((ipNum >>> 24) === 0) return { label: '本网络', cls: 'reserved' };
             if ((ipNum >>> 24) === 10) return { label: '私有地址 (A类)', cls: 'private' };
@@ -810,8 +707,6 @@
             return { label: '公网地址', cls: 'public' };
         }
 
-        // ===== Debounce =====
-
         function debounce(fn, delay) {
             let timer;
             return function (...args) {
@@ -821,7 +716,6 @@
         }
 
         // ===== DOM References =====
-
         const $input          = document.getElementById('calcInput');
         const $clearBtn       = document.getElementById('clearBtn');
         const $badge          = document.getElementById('formatBadge');
@@ -835,20 +729,16 @@
         const $toastContainer = document.getElementById('toastContainer');
         const $resultBadge    = document.getElementById('resultBadge');
 
-        // ===== Toast =====
-
+        // ===== Toast Notification =====
         function showToast(message) {
             const el = document.createElement('div');
             el.className = 'toast';
             el.textContent = message;
             $toastContainer.appendChild(el);
-            setTimeout(() => {
-                if (el.parentNode) el.remove();
-            }, 2500);
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 2500);
         }
 
-        // ===== Core Logic =====
-
+        // ===== Core Processing =====
         function processInput() {
             $error.style.display = 'none';
             $resultBadge.style.display = 'none';
@@ -866,10 +756,7 @@
 
             const normalized = raw.replace(/\s+/g, ' ');
 
-            let ipStr = '';
-            let maskNum = 0;
-            let cidr = 0;
-            let matched = false;
+            let ipStr = '', maskNum = 0, cidr = 0, matched = false;
 
             if (normalized.includes('/')) {
                 const parts = normalized.split('/');
@@ -878,16 +765,14 @@
                 if (isValidIp(ip) && cidrStr !== '' && !isNaN(cidrStr)) {
                     const c = parseInt(cidrStr, 10);
                     if (c >= 0 && c <= 32) {
-                        ipStr = ip;
-                        cidr = c;
+                        ipStr = ip; cidr = c;
                         maskNum = cidrToLongMask(cidr);
                         $badge.textContent = 'CIDR /' + cidr;
                         $badge.style.cssText = '';
                         matched = true;
                     }
                 }
-            }
-            else if (normalized.includes(' ')) {
+            } else if (normalized.includes(' ')) {
                 const parts = normalized.split(' ');
                 const ip = parts[0].trim();
                 const mask = parts[1].trim();
@@ -897,17 +782,16 @@
                     cidr = longMaskToCidr(maskNum);
                     if (cidr === -1) {
                         $badge.textContent = '⚠ 非连续掩码';
-                        $badge.style.background = 'var(--warn-bg)';
-                        $badge.style.color   = 'var(--warn-text)';
+                        $badge.style.background = 'rgba(245, 158, 11, 0.15)';
+                        $badge.style.color = '#f59e0b';
                     } else {
                         $badge.textContent = '掩码 /' + cidr;
-                        $badge.style.background = 'var(--success-bg)';
-                        $badge.style.color   = 'var(--success-text)';
+                        $badge.style.background = 'rgba(16, 185, 129, 0.15)';
+                        $badge.style.color = '#10b981';
                     }
                     matched = true;
                 }
-            }
-            else if (isValidIp(normalized)) {
+            } else if (isValidIp(normalized)) {
                 ipStr = normalized;
                 cidr = 32;
                 maskNum = cidrToLongMask(32);
@@ -923,8 +807,8 @@
                     $error.style.display = 'block';
                     $error.textContent = '⚠ 输入格式有误。请使用 CIDR（如 192.168.10.0/23）或 IP+掩码（如 192.168.10.0 255.255.255.0）';
                     $badge.textContent = '无法识别';
-                    $badge.style.background = 'var(--error-bg)';
-                    $badge.style.color   = 'var(--error-text)';
+                    $badge.style.background = 'rgba(239, 68, 68, 0.15)';
+                    $badge.style.color = '#ef4444';
                 }
                 $splitter.classList.remove('visible');
             }
@@ -939,24 +823,20 @@
             const broadcastNum = (networkNum | wildcardNum) >>> 0;
 
             const classification = classifyIp(ipNum);
-
             let usableHosts, hostRange;
 
             if (cidr === 32) {
-                usableHosts = 1;
-                hostRange = longToIp(networkNum) + '（单主机）';
+                usableHosts = 1; hostRange = longToIp(networkNum) + '（单主机）';
             } else if (cidr === 31) {
-                usableHosts = 2;
-                hostRange = longToIp(networkNum) + ' — ' + longToIp(broadcastNum);
+                usableHosts = 2; hostRange = longToIp(networkNum) + ' — ' + longToIp(broadcastNum);
             } else if (cidr >= 0 && cidr <= 30) {
                 usableHosts = Math.pow(2, 32 - cidr) - 2;
                 hostRange = longToIp(networkNum + 1) + ' — ' + longToIp(broadcastNum - 1);
             } else {
-                usableHosts = 'N/A';
-                hostRange = '非连续掩码，无法确定';
+                usableHosts = 'N/A'; hostRange = '非连续掩码，无法确定';
             }
 
-            const hexStr = 'IP: ' + toHex(ipNum) + '　掩码: ' + toHex(maskNum);
+            const hexStr = 'IP: ' + toHex(ipNum) + ' 掩码: ' + toHex(maskNum);
 
             const rows = [
                 { label: '分析 IP 地址',          value: ipStr,              extra: classification },
@@ -969,7 +849,6 @@
                 { label: '十六进制表示',            value: hexStr },
             ];
 
-            // Update result badge
             $resultBadge.style.display = 'inline-flex';
             $resultBadge.textContent = cidr >= 0 ? '/' + cidr + ' · ' + rows[0].extra.label : 'N/A';
 
@@ -983,27 +862,22 @@
                 tr.innerHTML =
                     '<td>' + escHtml(row.label) + '</td>' +
                     '<td>' + valueHtml + '</td>' +
-                    '<td><button class="copy-btn" data-copy="' + escAttr(row.value) + '" aria-label="复制 ' + escAttr(row.label) + '">复制</button></td>';
+                    '<td><button class="copy-btn" data-copy="' + escAttr(row.value) + '">复制</button></td>';
                 $container.appendChild(tr);
             }
 
             renderSubnetSplitter(networkNum, cidr);
         }
 
-        // ===== Event Delegation: Copy Buttons =====
-
         $container.addEventListener('click', function (e) {
             const btn = e.target.closest('.copy-btn');
             if (btn) {
                 const text = btn.getAttribute('data-copy');
-                if (text !== null) {
-                    copyText(text, btn);
-                }
+                if (text !== null) copyText(text);
             }
         });
 
         // ===== Subnet Splitter =====
-
         const DISPLAY_LIMIT = 512;
 
         function renderSubnetSplitter(networkNum, parentCidr) {
@@ -1066,9 +940,7 @@
             for (let i = 0; i < limit; i++) {
                 const addr = networkNum + i * step;
                 const broadcast = addr + step - 1;
-                const hosts = targetCidr === 32 ? 1
-                            : targetCidr === 31 ? 2
-                            : Math.pow(2, 32 - targetCidr) - 2;
+                const hosts = targetCidr === 32 ? 1 : targetCidr === 31 ? 2 : Math.pow(2, 32 - targetCidr) - 2;
                 const range = targetCidr >= 31
                     ? longToIp(addr) + ' — ' + longToIp(broadcast)
                     : longToIp(addr + 1) + ' — ' + longToIp(broadcast - 1);
@@ -1088,15 +960,11 @@
             $subnetTbody.appendChild(fragment);
         }
 
-        // ===== Empty State =====
-
         function renderEmpty() {
             $container.innerHTML = '<tr><td colspan="3" class="empty-state">输入 IP 地址后自动计算结果</td></tr>';
             $splitter.classList.remove('visible');
             $resultBadge.style.display = 'none';
         }
-
-        // ===== Escaping =====
 
         function escHtml(s) {
             const div = document.createElement('div');
@@ -1105,16 +973,10 @@
         }
 
         function escAttr(s) {
-            return s.replace(/&/g, '&amp;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
+            return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
-        // ===== Copy =====
-
-        function copyText(text, btn) {
+        function copyText(text) {
             const doCopy = () => {
                 if (!navigator.clipboard) {
                     const ta = document.createElement('textarea');
@@ -1131,21 +993,16 @@
             };
 
             doCopy().then(() => {
-                showToast('✅ 已复制: ' + text);
+                showToast('✨ 已成功复制: ' + text);
             }).catch(() => {
                 showToast('❌ 复制失败');
             });
         }
 
-        // ===== Event Binding =====
-
+        // ===== Event Bindings =====
         $input.addEventListener('input', debouncedProcess);
-
         $input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                processInput();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); processInput(); }
         });
 
         $clearBtn.addEventListener('click', function () {
