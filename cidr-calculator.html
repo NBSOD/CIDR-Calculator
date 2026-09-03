@@ -1,40 +1,51 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="webui3">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIDR 子网计算器 - WebUI 3 Edition</title>
+    <title>CIDR 子网计算器 - 多皮肤版</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ===== WebUI 3 视觉设计系统 ===== */
+        /* ============================================================
+               DESIGN TOKENS — 所有皮肤共享的基础结构变量
+               ============================================================ */
         :root {
-            /* 基础色板 */
+            /* 结构变量（各皮肤可覆盖） */
+            --card-radius: 24px;
+            --card-padding: 28px;
+            --input-radius: 14px;
+            --btn-radius: 12px;
+            --badge-radius: 18px;
+            --border-w: 1px;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --card-hover-transform: translateY(-2px);
+            --card-hover-border: rgba(99, 102, 241, 0.3);
+            --card-hover-shadow: var(--glass-shadow);
+        }
+
+        /* ============================================================
+               皮肤 1 — WebUI 3（玻璃拟态 / Indigo-Purple）
+               ============================================================ */
+        [data-theme="webui3"] {
             --brand-primary: #6366f1;
             --brand-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             --brand-glow: rgba(99, 102, 241, 0.25);
-            
-            /* 亮色模式 WebUI 3 变量 */
             --page-bg: #f8fafc;
             --bg-gradient: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
                          radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
-            
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.8);
             --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 15px rgba(255, 255, 255, 0.5) inset;
-            
             --text-main: #0f172a;
             --text-muted: #64748b;
             --text-subtle: #94a3b8;
-            
             --input-bg: rgba(255, 255, 255, 0.8);
             --input-border: rgba(226, 232, 240, 0.8);
-            
             --card-inner-bg: rgba(255, 255, 255, 0.4);
             --table-hover: rgba(99, 102, 241, 0.03);
-            
-            /* 标签色彩 */
             --badge-private-bg: rgba(168, 85, 247, 0.1);
             --badge-private-text: #7e22ce;
             --badge-public-bg: rgba(59, 130, 246, 0.1);
@@ -43,31 +54,31 @@
             --badge-reserved-text: #b45309;
             --badge-multicast-bg: rgba(16, 185, 129, 0.1);
             --badge-multicast-text: #047857;
-            
             --toast-bg: rgba(15, 23, 42, 0.9);
             --toast-text: #ffffff;
+            --card-hover-border: rgba(99, 102, 241, 0.3);
+            --card-radius: 24px;
+            --input-radius: 14px;
+            --btn-radius: 12px;
+            --badge-radius: 18px;
+            --border-w: 1px;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
-
-        body[data-ds-dark-theme] {
-            /* 暗色模式 WebUI 3 变量 */
+        [data-theme="webui3"][data-ds-dark-theme] {
             --page-bg: #0b0f17;
             --bg-gradient: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
                          radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
-            
             --glass-bg: rgba(18, 24, 38, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 1px 0px rgba(255, 255, 255, 0.1) inset;
-            
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --text-subtle: #64748b;
-            
             --input-bg: rgba(15, 23, 42, 0.6);
             --input-border: rgba(255, 255, 255, 0.1);
-            
             --card-inner-bg: rgba(255, 255, 255, 0.02);
             --table-hover: rgba(255, 255, 255, 0.02);
-            
             --badge-private-bg: rgba(168, 85, 247, 0.2);
             --badge-private-text: #c084fc;
             --badge-public-bg: rgba(59, 130, 246, 0.2);
@@ -76,15 +87,276 @@
             --badge-reserved-text: #fbbf24;
             --badge-multicast-bg: rgba(16, 185, 129, 0.2);
             --badge-multicast-text: #34d399;
-            
             --toast-bg: rgba(255, 255, 255, 0.95);
             --toast-text: #0f172a;
         }
 
+        /* ============================================================
+               皮肤 2 — Neumorphism（新拟物 / 浮雕质感）
+               ============================================================ */
+        [data-theme="neumorphism"] {
+            --brand-primary: #6c5ce7;
+            --brand-gradient: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --brand-glow: rgba(108, 92, 231, 0.15);
+            --page-bg: #e0e5ec;
+            --bg-gradient: none;
+            --glass-bg: #e0e5ec;
+            --glass-border: transparent;
+            --glass-shadow: 9px 9px 16px #b8bcc6, -9px -9px 16px #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --text-subtle: #b2bec3;
+            --input-bg: #e0e5ec;
+            --input-border: transparent;
+            --card-inner-bg: #e8edf5;
+            --table-hover: rgba(0, 0, 0, 0.02);
+            --badge-private-bg: rgba(108, 92, 231, 0.12);
+            --badge-private-text: #6c5ce7;
+            --badge-public-bg: rgba(0, 184, 148, 0.12);
+            --badge-public-text: #00b894;
+            --badge-reserved-bg: rgba(253, 203, 110, 0.2);
+            --badge-reserved-text: #d68910;
+            --badge-multicast-bg: rgba(116, 185, 255, 0.12);
+            --badge-multicast-text: #0984e3;
+            --toast-bg: rgba(45, 52, 54, 0.9);
+            --toast-text: #dfe6e9;
+            --card-hover-border: transparent;
+            --card-hover-transform: translateY(-1px);
+            --card-radius: 20px;
+            --input-radius: 12px;
+            --btn-radius: 10px;
+            --badge-radius: 16px;
+            --border-w: 0px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        [data-theme="neumorphism"][data-ds-dark-theme] {
+            --page-bg: #1a1d23;
+            --bg-gradient: none;
+            --glass-bg: #1a1d23;
+            --glass-border: transparent;
+            --glass-shadow: 9px 9px 16px #0c0e11, -9px -9px 16px #282c34;
+            --text-main: #dfe6e9;
+            --text-muted: #b2bec3;
+            --text-subtle: #636e72;
+            --input-bg: #1a1d23;
+            --input-border: transparent;
+            --card-inner-bg: #22262e;
+            --table-hover: rgba(255, 255, 255, 0.02);
+            --badge-private-bg: rgba(108, 92, 231, 0.2);
+            --badge-private-text: #a29bfe;
+            --badge-public-bg: rgba(0, 184, 148, 0.2);
+            --badge-public-text: #55efc4;
+            --badge-reserved-bg: rgba(253, 203, 110, 0.2);
+            --badge-reserved-text: #fdcb6e;
+            --badge-multicast-bg: rgba(116, 185, 255, 0.2);
+            --badge-multicast-text: #74b9ff;
+            --toast-bg: rgba(223, 230, 233, 0.95);
+            --toast-text: #1a1d23;
+        }
+
+        /* ============================================================
+               皮肤 3 — Minimalist（瑞士极简 / 留白+蓝）
+               ============================================================ */
+        [data-theme="minimalist"] {
+            --brand-primary: #2563eb;
+            --brand-gradient: none;
+            --brand-glow: rgba(37, 99, 235, 0.15);
+            --page-bg: #ffffff;
+            --bg-gradient: none;
+            --glass-bg: #ffffff;
+            --glass-border: #e5e7eb;
+            --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --text-subtle: #9ca3af;
+            --input-bg: #f9fafb;
+            --input-border: #d1d5db;
+            --card-inner-bg: #f9fafb;
+            --table-hover: rgba(0, 0, 0, 0.02);
+            --badge-private-bg: rgba(37, 99, 235, 0.08);
+            --badge-private-text: #1d4ed8;
+            --badge-public-bg: rgba(16, 185, 129, 0.08);
+            --badge-public-text: #047857;
+            --badge-reserved-bg: rgba(245, 158, 11, 0.1);
+            --badge-reserved-text: #b45309;
+            --badge-multicast-bg: rgba(139, 92, 246, 0.08);
+            --badge-multicast-text: #7c3aed;
+            --toast-bg: rgba(17, 24, 39, 0.9);
+            --toast-text: #ffffff;
+            --card-hover-border: var(--brand-primary);
+            --card-hover-transform: none;
+            --card-radius: 16px;
+            --input-radius: 8px;
+            --btn-radius: 6px;
+            --badge-radius: 14px;
+            --border-w: 1px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        [data-theme="minimalist"][data-ds-dark-theme] {
+            --page-bg: #0f172a;
+            --bg-gradient: none;
+            --glass-bg: #1e293b;
+            --glass-border: #334155;
+            --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+            --card-inner-bg: #1e293b;
+            --table-hover: rgba(255, 255, 255, 0.02);
+            --badge-private-bg: rgba(59, 130, 246, 0.15);
+            --badge-private-text: #60a5fa;
+            --badge-public-bg: rgba(16, 185, 129, 0.15);
+            --badge-public-text: #34d399;
+            --badge-reserved-bg: rgba(245, 158, 11, 0.15);
+            --badge-reserved-text: #fbbf24;
+            --badge-multicast-bg: rgba(139, 92, 246, 0.15);
+            --badge-multicast-text: #a78bfa;
+            --toast-bg: rgba(255, 255, 255, 0.95);
+            --toast-text: #0f172a;
+        }
+
+        /* ============================================================
+               皮肤 4 — Neubrutalism（新粗野主义 / 粗框+高对比）
+               ============================================================ */
+        [data-theme="neubrutalism"] {
+            --brand-primary: #ff4500;
+            --brand-gradient: none;
+            --brand-glow: rgba(255, 69, 0, 0.2);
+            --page-bg: #f0f0f0;
+            --bg-gradient: none;
+            --glass-bg: #ffffff;
+            --glass-border: #000000;
+            --glass-shadow: 5px 5px 0 #000000;
+            --text-main: #000000;
+            --text-muted: #444444;
+            --text-subtle: #666666;
+            --input-bg: #ffffff;
+            --input-border: #000000;
+            --card-inner-bg: #ffffff;
+            --table-hover: #f0f0f0;
+            --badge-private-bg: rgba(255, 69, 0, 0.15);
+            --badge-private-text: #cc3700;
+            --badge-public-bg: rgba(0, 120, 255, 0.15);
+            --badge-public-text: #0055cc;
+            --badge-reserved-bg: rgba(255, 200, 0, 0.2);
+            --badge-reserved-text: #cc9900;
+            --badge-multicast-bg: rgba(0, 200, 100, 0.15);
+            --badge-multicast-text: #00994d;
+            --toast-bg: #000000;
+            --toast-text: #ffffff;
+            --card-hover-border: #000000;
+            --card-hover-transform: translateY(-3px);
+            --card-hover-shadow: 3px 3px 0 #000000;
+            --card-radius: 8px;
+            --input-radius: 6px;
+            --btn-radius: 4px;
+            --badge-radius: 4px;
+            --border-w: 2px;
+            --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        [data-theme="neubrutalism"][data-ds-dark-theme] {
+            --page-bg: #1a1a1a;
+            --bg-gradient: none;
+            --glass-bg: #2a2a2a;
+            --glass-border: #ffffff;
+            --glass-shadow: 5px 5px 0 #ffffff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --text-subtle: #999999;
+            --input-bg: #2a2a2a;
+            --input-border: #ffffff;
+            --card-inner-bg: #2a2a2a;
+            --table-hover: #333333;
+            --badge-private-bg: rgba(255, 69, 0, 0.25);
+            --badge-private-text: #ff6b35;
+            --badge-public-bg: rgba(0, 120, 255, 0.25);
+            --badge-public-text: #4d94ff;
+            --badge-reserved-bg: rgba(255, 200, 0, 0.25);
+            --badge-reserved-text: #ffd633;
+            --badge-multicast-bg: rgba(0, 200, 100, 0.25);
+            --badge-multicast-text: #33cc77;
+            --toast-bg: #ffffff;
+            --toast-text: #000000;
+        }
+
+        /* ============================================================
+               皮肤 5 — 3D & Liquid Organic（液态有机 / 暖色软胶）
+               ============================================================ */
+        [data-theme="organic"] {
+            --brand-primary: #e07a5f;
+            --brand-gradient: linear-gradient(135deg, #e07a5f, #81b29a);
+            --brand-glow: rgba(224, 122, 95, 0.2);
+            --page-bg: #faf5f0;
+            --bg-gradient: radial-gradient(circle at 20% 30%, rgba(255, 154, 138, 0.15) 0%, transparent 55%),
+                         radial-gradient(circle at 80% 70%, rgba(129, 178, 154, 0.12) 0%, transparent 55%);
+            --glass-bg: rgba(255, 248, 245, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 30px rgba(255, 200, 180, 0.15) inset;
+            --text-main: #2d1810;
+            --text-muted: #8b6f5e;
+            --text-subtle: #b8a090;
+            --input-bg: rgba(255, 248, 245, 0.8);
+            --input-border: rgba(230, 200, 180, 0.5);
+            --card-inner-bg: rgba(255, 248, 245, 0.5);
+            --table-hover: rgba(255, 154, 138, 0.04);
+            --badge-private-bg: rgba(224, 122, 95, 0.12);
+            --badge-private-text: #c06040;
+            --badge-public-bg: rgba(129, 178, 154, 0.12);
+            --badge-public-text: #5a8f7a;
+            --badge-reserved-bg: rgba(230, 180, 140, 0.2);
+            --badge-reserved-text: #a07040;
+            --badge-multicast-bg: rgba(150, 180, 220, 0.15);
+            --badge-multicast-text: #4a6a8a;
+            --toast-bg: rgba(45, 24, 16, 0.9);
+            --toast-text: #faf5f0;
+            --card-hover-border: rgba(224, 122, 95, 0.3);
+            --card-hover-transform: translateY(-3px) scale(1.01);
+            --card-radius: 30px;
+            --input-radius: 18px;
+            --btn-radius: 16px;
+            --badge-radius: 20px;
+            --border-w: 1px;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        [data-theme="organic"][data-ds-dark-theme] {
+            --page-bg: #0f0d1a;
+            --bg-gradient: radial-gradient(circle at 30% 20%, rgba(94, 156, 255, 0.1) 0%, transparent 50%),
+                         radial-gradient(circle at 70% 80%, rgba(255, 107, 157, 0.08) 0%, transparent 50%);
+            --glass-bg: rgba(20, 18, 35, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(100, 80, 150, 0.08) inset;
+            --text-main: #f0ece4;
+            --text-muted: #9a8e9e;
+            --text-subtle: #6a5e6e;
+            --input-bg: rgba(20, 18, 35, 0.6);
+            --input-border: rgba(255, 255, 255, 0.08);
+            --card-inner-bg: rgba(255, 255, 255, 0.02);
+            --table-hover: rgba(255, 255, 255, 0.02);
+            --badge-private-bg: rgba(244, 162, 97, 0.2);
+            --badge-private-text: #f4a261;
+            --badge-public-bg: rgba(94, 156, 255, 0.2);
+            --badge-public-text: #5e9cff;
+            --badge-reserved-bg: rgba(255, 200, 100, 0.2);
+            --badge-reserved-text: #ffc864;
+            --badge-multicast-bg: rgba(255, 107, 157, 0.2);
+            --badge-multicast-text: #ff6b9d;
+            --toast-bg: rgba(240, 236, 228, 0.95);
+            --toast-text: #0f0d1a;
+        }
+
+        /* ============================================================
+               全局样式
+               ============================================================ */
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--page-bg);
             background-image: var(--bg-gradient);
             background-attachment: fixed;
@@ -103,7 +375,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             background: color-mix(in srgb, var(--page-bg) 60%, transparent);
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: var(--border-w) solid var(--glass-border);
         }
         .webui-header-bar {
             max-width: 900px;
@@ -130,8 +402,48 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--brand-gradient);
+            background: var(--brand-gradient, var(--brand-primary));
             box-shadow: 0 0 10px var(--brand-primary);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== 皮肤选择器 ===== */
+        .skin-select {
+            height: 40px;
+            padding: 0 14px 0 16px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            border: var(--border-w) solid var(--glass-border);
+            border-radius: var(--btn-radius);
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            color: var(--text-main);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--glass-shadow);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 34px;
+        }
+        .skin-select:hover {
+            border-color: var(--brand-primary);
+        }
+        .skin-select:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px var(--brand-glow);
+        }
+        .skin-select option {
+            background: var(--page-bg);
+            color: var(--text-main);
         }
 
         .theme-btn {
@@ -140,8 +452,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
+            border: var(--border-w) solid var(--glass-border);
+            border-radius: var(--btn-radius);
             background: var(--glass-bg);
             backdrop-filter: blur(8px);
             color: var(--text-main);
@@ -175,32 +487,45 @@
             line-height: 1.2;
         }
         .webui-gradient-text {
-            background: var(--brand-gradient);
+            background: var(--brand-gradient, var(--brand-primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .webui-page-title p {
             margin: 10px 0 0;
             font-size: 15px;
             color: var(--text-muted);
         }
+        .webui-page-title .skin-tag {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-subtle);
+            background: var(--card-inner-bg);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: var(--border-w) solid var(--glass-border);
+        }
 
-        /* ===== WebUI 3 Card ===== */
+        /* ===== Card ===== */
         .webui-card {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 28px;
+            border: var(--border-w) solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: var(--card-padding);
             margin-bottom: 24px;
             box-shadow: var(--glass-shadow);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .webui-card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
+            border-color: var(--card-hover-border);
+            transform: var(--card-hover-transform);
+            box-shadow: var(--card-hover-shadow, var(--glass-shadow));
         }
-
         .webui-card-title {
             display: flex;
             align-items: center;
@@ -230,10 +555,10 @@
             width: 100%;
             padding: 14px 42px 14px 16px;
             font-size: 15px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-weight: 500;
-            border: 1px solid var(--input-border);
-            border-radius: 14px;
+            border: var(--border-w) solid var(--input-border);
+            border-radius: var(--input-radius);
             outline: none;
             background: var(--input-bg);
             color: var(--text-main);
@@ -244,7 +569,6 @@
             border-color: var(--brand-primary);
             box-shadow: 0 0 0 4px var(--brand-glow);
         }
-
         .clear-btn {
             position: absolute;
             right: 12px;
@@ -274,10 +598,10 @@
             padding: 0 16px;
             font-size: 13px;
             font-weight: 600;
-            border-radius: 18px;
+            border-radius: var(--badge-radius);
             background: rgba(99, 102, 241, 0.12);
             color: var(--brand-primary);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: var(--border-w) solid rgba(99, 102, 241, 0.2);
             white-space: nowrap;
             transition: all 0.2s ease;
         }
@@ -296,7 +620,7 @@
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
             padding: 10px 14px;
-            border-radius: 12px;
+            border-radius: var(--input-radius);
         }
 
         /* ===== Quick Presets ===== */
@@ -312,10 +636,10 @@
             height: 32px;
             padding: 0 14px;
             font-size: 12px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-weight: 500;
-            border: 1px solid var(--input-border);
-            border-radius: 20px;
+            border: var(--border-w) solid var(--input-border);
+            border-radius: calc(var(--badge-radius) + 2px);
             background: var(--input-bg);
             color: var(--text-muted);
             cursor: pointer;
@@ -330,8 +654,8 @@
         /* ===== Results Table ===== */
         .table-wrap {
             overflow-x: auto;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
+            border-radius: var(--input-radius);
+            border: var(--border-w) solid var(--glass-border);
             background: var(--card-inner-bg);
         }
         table {
@@ -342,7 +666,7 @@
         th, td {
             text-align: left;
             padding: 14px 18px;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: var(--border-w) solid var(--glass-border);
         }
         th {
             background: rgba(150, 150, 150, 0.03);
@@ -358,7 +682,7 @@
             background: rgba(99, 102, 241, 0.08);
             padding: 4px 8px;
             border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 13.5px;
             color: var(--text-main);
         }
@@ -372,13 +696,13 @@
             align-items: center;
             justify-content: center;
             background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: var(--border-w) solid rgba(99, 102, 241, 0.2);
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
             color: var(--brand-primary);
             padding: 4px 12px;
-            border-radius: 12px;
+            border-radius: var(--btn-radius);
             transition: all 0.2s ease;
             height: 30px;
         }
@@ -430,9 +754,9 @@
             height: 34px;
             padding: 0 16px;
             font-size: 13px;
-            font-family: 'JetBrains Mono', monospace;
-            border: 1px solid var(--input-border);
-            border-radius: 17px;
+            font-family: var(--font-mono);
+            border: var(--border-w) solid var(--input-border);
+            border-radius: calc(var(--input-radius) + 2px);
             background: var(--input-bg);
             color: var(--text-main);
             cursor: pointer;
@@ -451,14 +775,14 @@
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid rgba(245, 158, 11, 0.2);
             padding: 10px 14px;
-            border-radius: 12px;
+            border-radius: var(--input-radius);
             margin-bottom: 14px;
         }
         .subnet-splitter .subnet-table-wrap {
             max-height: 360px;
             overflow-y: auto;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
+            border-radius: var(--input-radius);
+            border: var(--border-w) solid var(--glass-border);
             background: var(--card-inner-bg);
         }
         .subnet-splitter .subnet-table-wrap table { font-size: 13px; }
@@ -497,7 +821,7 @@
             background: var(--toast-bg);
             color: var(--toast-text);
             padding: 12px 22px;
-            border-radius: 16px;
+            border-radius: var(--input-radius);
             font-size: 14px;
             font-weight: 600;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -514,12 +838,28 @@
             to   { opacity: 0; transform: translateY(-10px) scale(0.9); }
         }
 
+        /* ===== Neubrutalism 特殊修复 ===== */
+        [data-theme="neubrutalism"] .webui-card {
+            box-shadow: 5px 5px 0 #000000;
+        }
+        [data-theme="neubrutalism"] .webui-card:hover {
+            box-shadow: 3px 3px 0 #000000;
+        }
+        [data-theme="neubrutalism"][data-ds-dark-theme] .webui-card {
+            box-shadow: 5px 5px 0 #ffffff;
+        }
+        [data-theme="neubrutalism"][data-ds-dark-theme] .webui-card:hover {
+            box-shadow: 3px 3px 0 #ffffff;
+        }
+
         @media (max-width: 640px) {
             .webui-page-title h1 { font-size: 28px; }
             .webui-card { padding: 20px; border-radius: 18px; }
             .input-row { flex-direction: column; align-items: stretch; }
             .format-badge { align-self: flex-start; }
             .toast-container { bottom: 16px; right: 16px; left: 16px; }
+            .header-actions { gap: 6px; }
+            .skin-select { max-width: 120px; font-size: 12px; padding: 0 28px 0 10px; background-position: right 8px center; }
         }
     </style>
 </head>
@@ -534,7 +874,14 @@
                     CIDR 计算器
                 </span>
             </a>
-            <div>
+            <div class="header-actions">
+                <select id="skinSelect" class="skin-select" aria-label="选择皮肤风格">
+                    <option value="webui3">WebUI 3</option>
+                    <option value="neumorphism">Neumorphism</option>
+                    <option value="minimalist">Minimalist</option>
+                    <option value="neubrutalism">Neubrutalism</option>
+                    <option value="organic">3D · Organic</option>
+                </select>
                 <button id="themeToggle" class="theme-btn" aria-label="切换主题">☀️</button>
             </div>
         </div>
@@ -546,7 +893,8 @@
         <!-- Page Title -->
         <div class="webui-page-title">
             <h1><span class="webui-gradient-text">IPv4</span> CIDR 计算器</h1>
-            <p>基于 WebUI 3 视觉架构的现代子网划分与 IP 分析工具</p>
+            <p>多皮肤可切换的现代子网划分与 IP 分析工具</p>
+            <span id="skinTag" class="skin-tag">WebUI 3</span>
         </div>
 
         <!-- Input Card -->
@@ -637,39 +985,76 @@
     <script>
         'use strict';
 
-        // ===== Theme Logic =====
+        // ====================================================================
+        //  皮肤 & 主题管理
+        // ====================================================================
         const $themeBtn = document.getElementById('themeToggle');
+        const $skinSelect = document.getElementById('skinSelect');
+        const $skinTag = document.getElementById('skinTag');
 
+        const SKIN_NAMES = {
+            webui3: 'WebUI 3',
+            neumorphism: 'Neumorphism',
+            minimalist: 'Minimalist',
+            neubrutalism: 'Neubrutalism',
+            organic: '3D · Organic'
+        };
+
+        // ---------- 暗色模式 ----------
         function getSystemDark() {
             return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
-        function getStoredTheme() {
-            try { return localStorage.getItem('webui3-cidr-theme'); } catch { return null; }
+        function getStoredDark() {
+            try { return localStorage.getItem('cidr-dark-mode'); } catch { return null; }
         }
-        function setStoredTheme(v) {
-            try { if (v) localStorage.setItem('webui3-cidr-theme', v); else localStorage.removeItem('webui3-cidr-theme'); } catch {}
+        function setStoredDark(v) {
+            try { if (v) localStorage.setItem('cidr-dark-mode', v); else localStorage.removeItem('cidr-dark-mode'); } catch {}
         }
-        function applyTheme(dark) {
+        function applyDark(dark) {
             document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-            document.body.toggleAttribute('data-ds-dark-theme', dark);
+            document.documentElement.toggleAttribute('data-ds-dark-theme', dark);
             $themeBtn.textContent = dark ? '☀️' : '🌙';
         }
-        function resolveTheme() {
-            const stored = getStoredTheme();
+        function resolveDark() {
+            const stored = getStoredDark();
             if (stored === 'dark') return true;
             if (stored === 'light') return false;
             return getSystemDark();
         }
 
         $themeBtn.addEventListener('click', function () {
-            const isDark = document.body.hasAttribute('data-ds-dark-theme');
-            applyTheme(!isDark);
-            setStoredTheme(!isDark ? 'dark' : 'light');
+            const isDark = document.documentElement.hasAttribute('data-ds-dark-theme');
+            applyDark(!isDark);
+            setStoredDark(!isDark ? 'dark' : 'light');
         });
 
-        applyTheme(resolveTheme());
+        // ---------- 皮肤 ----------
+        function getStoredSkin() {
+            try { return localStorage.getItem('cidr-skin') || 'webui3'; } catch { return 'webui3'; }
+        }
+        function setStoredSkin(v) {
+            try { localStorage.setItem('cidr-skin', v); } catch {}
+        }
+        function applySkin(skin) {
+            document.documentElement.setAttribute('data-theme', skin);
+            $skinSelect.value = skin;
+            $skinTag.textContent = SKIN_NAMES[skin] || skin;
+        }
 
-        // ===== Calculator Logic Utilities =====
+        $skinSelect.addEventListener('change', function () {
+            const skin = this.value;
+            applySkin(skin);
+            setStoredSkin(skin);
+        });
+
+        // 初始化
+        applyDark(resolveDark());
+        applySkin(getStoredSkin());
+
+        // ====================================================================
+        //  计算器核心逻辑
+        // ====================================================================
+
         function isValidIp(ip) {
             return /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip);
         }
@@ -694,7 +1079,6 @@
             return '0x' + n.toString(16).toUpperCase().padStart(8, '0');
         }
 
-        // ===== IP Classification =====
         function classifyIp(ipNum) {
             if ((ipNum >>> 24) === 0) return { label: '本网络', cls: 'reserved' };
             if ((ipNum >>> 24) === 10) return { label: '私有地址 (A类)', cls: 'private' };
@@ -729,7 +1113,7 @@
         const $toastContainer = document.getElementById('toastContainer');
         const $resultBadge    = document.getElementById('resultBadge');
 
-        // ===== Toast Notification =====
+        // ===== Toast =====
         function showToast(message) {
             const el = document.createElement('div');
             el.className = 'toast';
