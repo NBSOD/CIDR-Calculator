@@ -1,189 +1,414 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPv4 反掩码计算器</title>
+    <title>CIDR 子网计算器 · 一切皆插件</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Host+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        /* ===== 全局 & 主题 ===== */
+        /* ===== DeepSeek Harness 设计系统 — 样式参考 deepseek.com/harness ===== */
+
         :root {
-            --bg-page: #f0f2f5;
-            --bg-card: #fff;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --accent: #4f46e5;
-            --accent-light: #e0e7ff;
-            --accent-text: #4338ca;
-            --success-bg: #ccfbf1;
-            --success-text: #0f766e;
-            --error-bg: #fee2e2;
-            --error-text: #b91c1c;
-            --code-bg: #f1f5f9;
-            --table-header: #f8fafc;
-            --table-border: #edf2f7;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --badge-warn-bg: #fef9c3;
-            --badge-warn-text: #a16207;
-            --preset-bg: #f1f5f9;
-            --preset-hover: #e2e8f0;
-            --binary-bg: #f8fafc;
-            --binary-border: #e2e8f0;
+            /* Static colors (same across themes) */
+            --ds-static-neutral-bluish-00: #fff;
+            --ds-static-neutral-bluish-50: #f9fafb;
+            --ds-static-neutral-bluish-60: #f9fafb;
+            --ds-static-neutral-bluish-75: #f1f3f5;
+            --ds-static-neutral-bluish-100: #ebeef2;
+            --ds-static-neutral-bluish-150: #e9ecf2;
+            --ds-static-neutral-bluish-200: #e1e5ee;
+            --ds-static-neutral-bluish-300: #cfd3d6;
+            --ds-static-neutral-bluish-400: #adb2b8;
+            --ds-static-neutral-bluish-500: #979da6;
+            --ds-static-neutral-bluish-600: #81858c;
+            --ds-static-neutral-bluish-700: #61666b;
+            --ds-static-neutral-bluish-750: #43454a;
+            --ds-static-neutral-bluish-800: #353638;
+            --ds-static-neutral-bluish-850: #2c2c2e;
+            --ds-static-neutral-bluish-875: #232324;
+            --ds-static-neutral-bluish-900: #1b1b1c;
+            --ds-static-neutral-bluish-950: #151517;
+            --ds-static-neutral-bluish-1000: #0f1115;
+            --ds-static-deepseek-50: #edf3fe;
+            --ds-static-deepseek-100: #e4edfd;
+            --ds-static-deepseek-200: #d3e2ff;
+            --ds-static-deepseek-300: #b7c8fe;
+            --ds-static-deepseek-400: #679efe;
+            --ds-static-deepseek-450: #5686fe;
+            --ds-static-deepseek-500: #4176e6;
+            --ds-static-deepseek-600: #4868b2;
+            --ds-static-deepseek-800: #34415b;
+            --ds-static-deepseek-900: #283142;
+            --ds-static-green-400: #4ed17e;
+            --ds-static-green-500: #22c55e;
+            --ds-static-red-400: #f25a5a;
+            --ds-static-red-500: #ef4444;
+            --ds-static-red-600: #ec1313;
+            --ds-static-amber-400: #f7ad31;
+            --ds-static-amber-500: #f59e0b;
+
+            /* Light theme aliases */
+            --ds-page: #f0f6ff;
+            --ds-surface-1: var(--ds-static-neutral-bluish-00);
+            --ds-surface-3: var(--ds-static-neutral-bluish-00);
+            --ds-primary: var(--ds-static-neutral-bluish-1000);
+            --ds-description: var(--ds-static-neutral-bluish-700);
+            --ds-secondary: var(--ds-static-neutral-bluish-600);
+            --ds-brand: var(--ds-static-deepseek-500);
+            --ds-brand-light: var(--ds-static-deepseek-100);
+            --ds-border-default: rgb(0 0 0 / 10%);
+            --ds-border-subtle: rgb(0 0 0 / 6%);
+            --ds-border-l2: rgb(0 0 0 / 6%);
+
+            /* Semantic aliases */
+            --success-bg: #ecfdf5;
+            --success-text: #059669;
+            --error-bg: #fef2f2;
+            --error-text: #dc2626;
+            --warn-bg: #fffbeb;
+            --warn-text: #d97706;
+            --code-bg: rgb(0 0 0 / 4%);
+            --table-header: rgb(0 0 0 / 2%);
+            --table-border: rgb(0 0 0 / 6%);
+            --preset-hover: rgb(0 0 0 / 8%);
+            --private-bg: #f5f3ff;
+            --private-text: #6d28d9;
+            --public-bg: #eff6ff;
+            --public-text: #2563eb;
+            --loopback-bg: #fdf2f8;
+            --loopback-text: #be185d;
+            --reserved-bg: #fef3c7;
+            --reserved-text: #b45309;
+            --multicast-bg: #f0fdf4;
+            --multicast-text: #16a34a;
+            --toast-bg: var(--ds-static-neutral-bluish-1000);
+            --toast-text: var(--ds-static-neutral-bluish-00);
+            --subnet-table-max: 360px;
+            --input-bg: var(--ds-static-neutral-bluish-00);
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-page: #0f172a;
-                --bg-card: #1e293b;
-                --text-primary: #e2e8f0;
-                --text-secondary: #94a3b8;
-                --text-muted: #64748b;
-                --border: #334155;
-                --accent: #818cf8;
-                --accent-light: #1e1b4b;
-                --accent-text: #a5b4fc;
-                --success-bg: #064e3b;
-                --success-text: #6ee7b7;
-                --error-bg: #450a0a;
-                --error-text: #fca5a5;
-                --code-bg: #0f172a;
-                --table-header: #1e293b;
-                --table-border: #334155;
-                --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-                --badge-warn-bg: #713f12;
-                --badge-warn-text: #fde047;
-                --preset-bg: #334155;
-                --preset-hover: #475569;
-                --binary-bg: #0f172a;
-                --binary-border: #334155;
-            }
+        body[data-ds-dark-theme] {
+            --ds-page: var(--ds-static-neutral-bluish-950);
+            --ds-surface-1: var(--ds-static-neutral-bluish-875);
+            --ds-surface-3: var(--ds-static-neutral-bluish-900);
+            --ds-primary: var(--ds-static-neutral-bluish-50);
+            --ds-description: var(--ds-static-neutral-bluish-300);
+            --ds-secondary: var(--ds-static-neutral-bluish-400);
+            --ds-brand: var(--ds-static-deepseek-400);
+            --ds-brand-light: var(--ds-static-deepseek-900);
+            --ds-border-default: rgb(255 255 255 / 10%);
+            --ds-border-subtle: rgb(255 255 255 / 6%);
+            --ds-border-l2: rgb(255 255 255 / 6%);
+            --success-bg: #052e16;
+            --success-text: #6ee7b7;
+            --error-bg: #450a0a;
+            --error-text: #fca5a5;
+            --warn-bg: #451a03;
+            --warn-text: #fcd34d;
+            --code-bg: rgb(255 255 255 / 6%);
+            --table-header: rgb(255 255 255 / 3%);
+            --table-border: rgb(255 255 255 / 6%);
+            --preset-hover: rgb(255 255 255 / 10%);
+            --private-bg: #2e1065;
+            --private-text: #c4b5fd;
+            --public-bg: #1e3a5f;
+            --public-text: #93c5fd;
+            --loopback-bg: #4a0e2e;
+            --loopback-text: #f9a8d4;
+            --reserved-bg: #451a03;
+            --reserved-text: #fcd34d;
+            --multicast-bg: #052e16;
+            --multicast-text: #6ee7b7;
+            --toast-bg: var(--ds-static-neutral-bluish-50);
+            --toast-text: var(--ds-static-neutral-bluish-1000);
+            --input-bg: var(--ds-static-neutral-bluish-875);
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-page);
+            font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: var(--ds-page);
             margin: 0;
-            padding: 20px;
-            color: var(--text-primary);
+            color: var(--ds-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             transition: background 0.2s, color 0.2s;
+            min-height: 100vh;
         }
 
-        .card {
-            max-width: 700px;
+        /* ===== Header Bar ===== */
+        .ds-header-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: color-mix(in srgb, var(--ds-page) 80%, transparent);
+            border-bottom: 1px solid var(--ds-border-subtle);
+        }
+        .ds-header-bar {
+            max-width: 1280px;
             margin: 0 auto;
-            background: var(--bg-card);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            transition: background 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
         }
-
-        .header {
-            background: var(--accent);
-            color: #fff;
-            padding: 20px 24px;
+        .ds-header-bar a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--ds-primary);
+            min-width: 0;
         }
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
+        .ds-header-bar .ds-logo {
+            font-family: "Host Grotesk", "DM Sans", sans-serif;
+            font-size: 18px;
             font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .header p {
-            margin: 6px 0 0 0;
-            font-size: 13px;
-            opacity: 0.85;
+        .ds-header-bar .ds-logo .ds-brand-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            background: var(--ds-brand);
+        }
+        .ds-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .section {
-            padding: 20px 24px;
+        .theme-btn {
+            flex: none;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--ds-border-default);
+            border-radius: 18px;
+            background: transparent;
+            color: var(--ds-description);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            padding: 0;
         }
-        .section + .section {
-            border-top: 1px solid var(--border);
+        .theme-btn:hover {
+            background: var(--preset-hover);
+            color: var(--ds-primary);
+            border-color: var(--ds-border-default);
+        }
+        .theme-btn:focus-visible {
+            outline: 2px solid var(--ds-brand);
+            outline-offset: 2px;
+        }
+
+        /* ===== Result Badge ===== */
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            height: 26px;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 13px;
+            white-space: nowrap;
+            background: var(--ds-brand-light);
+            color: var(--ds-brand);
+            transition: background 0.2s, color 0.2s;
+            margin-left: 8px;
+        }
+
+        /* ===== Container ===== */
+        .ds-container {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Page Title ===== */
+        .ds-page-title {
+            padding: 40px 0 24px;
+        }
+        .ds-page-title h1 {
+            font-family: "Host Grotesk", "DM Sans", sans-serif;
+            font-size: 34px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: var(--ds-primary);
+        }
+        .ds-page-title .ds-brand-text {
+            color: var(--ds-brand);
+        }
+        .ds-page-title p {
+            margin: 12px 0 0;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--ds-description);
+            max-width: 640px;
+        }
+
+        /* ===== Section Cards ===== */
+        .ds-card {
+            background: var(--ds-surface-3);
+            border: 1px solid var(--ds-border-default);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+        }
+
+        .ds-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ds-primary);
+        }
+        .ds-card-title svg {
+            flex-shrink: 0;
+            color: var(--ds-brand);
         }
 
         label {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            color: var(--ds-description);
         }
 
+        /* ===== Input ===== */
         .input-row {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             align-items: center;
         }
-        .input-row input {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px;
-            font-size: 16px;
-            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            outline: none;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            transition: border-color 0.15s, background 0.2s, color 0.2s;
+        .input-wrap {
+            flex: 0 1 auto;
+            min-width: 220px;
+            max-width: 460px;
+            position: relative;
         }
-        .input-row input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        .input-wrap input {
+            width: 100%;
+            min-width: 220px;
+            padding: 12px 40px 12px 14px;
+            font-size: 16px;
+            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            border: 1px solid var(--ds-border-default);
+            border-radius: 8px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--ds-primary);
+            transition: border-color 0.15s, background 0.2s;
+        }
+        .input-wrap input:focus {
+            border-color: var(--ds-brand);
+        }
+        .input-wrap input::placeholder {
+            color: var(--ds-secondary);
         }
 
-        .badge {
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 700;
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--ds-description);
+            padding: 2px 6px;
+            line-height: 1;
+            display: none;
             border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
+            z-index: 2;
+        }
+        .clear-btn:hover {
+            color: var(--ds-primary);
+            background: var(--preset-hover);
+        }
+        .clear-btn.visible { display: block; }
+
+        /* ===== Format Badge ===== */
+        .format-badge {
+            display: inline-flex;
+            align-items: center;
+            height: 32px;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 16px;
             white-space: nowrap;
-            background: var(--accent-light);
-            color: var(--accent-text);
+            background: var(--ds-brand-light);
+            color: var(--ds-brand);
             transition: background 0.2s, color 0.2s;
         }
 
         .error-msg {
             display: none;
             color: var(--error-text);
-            font-size: 13px;
-            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 10px;
             background: var(--error-bg);
-            padding: 10px 12px;
-            border-radius: 6px;
-            line-height: 1.4;
+            padding: 11px 14px;
+            border-radius: 8px;
         }
 
-        /* ===== 快速预设 ===== */
+        /* ===== Quick Presets ===== */
         .presets {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 10px;
+            margin-top: 14px;
         }
         .presets button {
-            padding: 5px 12px;
-            font-size: 12px;
-            font-family: monospace;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: var(--preset-bg);
-            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            height: 30px;
+            padding: 0 14px;
+            font-size: 13px;
+            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, monospace;
+            border: 1px solid var(--ds-border-default);
+            border-radius: 15px;
+            background: transparent;
+            color: var(--ds-description);
             cursor: pointer;
             transition: background 0.15s, color 0.15s, border-color 0.15s;
         }
         .presets button:hover {
             background: var(--preset-hover);
-            color: var(--text-primary);
-            border-color: var(--accent);
+            color: var(--ds-primary);
+        }
+        .presets button:focus-visible {
+            outline: 2px solid var(--ds-brand);
+            outline-offset: 2px;
         }
 
-        /* ===== 结果表格 ===== */
+        /* ===== Results Table ===== */
         .table-wrap {
             overflow-x: auto;
+            border: 1px solid var(--ds-border-l2);
+            border-radius: 8px;
         }
         table {
             width: 100%;
@@ -192,146 +417,253 @@
         }
         th, td {
             text-align: left;
-            padding: 11px 12px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--table-border);
         }
         th {
             background: var(--table-header);
-            color: var(--text-secondary);
+            color: var(--ds-description);
             font-weight: 600;
             font-size: 13px;
+            letter-spacing: 0.02em;
         }
+        tr:last-child td { border-bottom: none; }
         td code {
             background: var(--code-bg);
             padding: 3px 8px;
             border-radius: 4px;
-            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
-            font-size: 13px;
-            color: var(--text-primary);
+            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 14px;
+            color: var(--ds-primary);
             word-break: break-all;
-            transition: background 0.2s, color 0.2s;
+            transition: background 0.2s;
         }
         td:last-child {
             text-align: right;
-            width: 70px;
+            width: 72px;
         }
 
         .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: none;
             border: 1px solid transparent;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            color: var(--accent);
+            color: var(--ds-brand);
             padding: 4px 10px;
-            border-radius: 4px;
-            transition: background 0.15s, border-color 0.15s;
+            border-radius: 14px;
+            transition: background 0.15s, color 0.15s;
+            height: 28px;
         }
         .copy-btn:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
+            background: var(--ds-brand-light);
+            color: var(--ds-brand);
         }
-        .copy-btn.copied {
-            color: #16a34a;
-            border-color: #16a34a;
-        }
-        @media (prefers-color-scheme: dark) {
-            .copy-btn.copied { color: #6ee7b7; border-color: #6ee7b7; }
+        .copy-btn:focus-visible {
+            outline: 2px solid var(--ds-brand);
+            outline-offset: 2px;
         }
 
-        /* ===== 二进制展开 ===== */
-        .binary-section {
-            margin-top: 16px;
-            padding: 14px 16px;
-            background: var(--binary-bg);
-            border: 1px solid var(--binary-border);
-            border-radius: 6px;
-            font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
-            font-size: 13px;
-            line-height: 1.8;
-            transition: background 0.2s, border-color 0.2s;
-            overflow-x: auto;
+        /* ===== IP Classification Tags ===== */
+        .ip-class {
+            display: inline-flex;
+            align-items: center;
+            height: 24px;
+            padding: 0 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
-        .binary-section .bin-row {
+        .ip-class.private    { background: var(--private-bg); color: var(--private-text); }
+        .ip-class.public     { background: var(--public-bg); color: var(--public-text); }
+        .ip-class.loopback   { background: var(--loopback-bg); color: var(--loopback-text); }
+        .ip-class.reserved   { background: var(--reserved-bg); color: var(--reserved-text); }
+        .ip-class.link-local { background: var(--reserved-bg); color: var(--reserved-text); }
+        .ip-class.multicast  { background: var(--multicast-bg); color: var(--multicast-text); }
+
+        /* ===== Subnet Splitter ===== */
+        .subnet-splitter {
+            margin-top: 16px;
+            display: none;
+        }
+        .subnet-splitter.visible { display: block; }
+        .subnet-splitter .split-header {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 6px;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .subnet-splitter .split-header label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        .subnet-splitter select {
+            height: 30px;
+            padding: 0 14px;
+            font-size: 14px;
+            font-family: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, monospace;
+            border: 1px solid var(--ds-border-default);
+            border-radius: 15px;
+            background: var(--input-bg);
+            color: var(--ds-primary);
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .subnet-splitter select:focus { border-color: var(--ds-brand); }
+        .subnet-splitter .split-count {
+            font-size: 13px;
+            color: var(--ds-description);
+        }
+        .subnet-splitter .split-count strong { color: var(--ds-primary); }
+        .subnet-splitter .split-warning {
+            font-size: 13px;
+            color: var(--warn-text);
+            background: var(--warn-bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .subnet-splitter .subnet-table-wrap {
+            max-height: var(--subnet-table-max);
+            overflow-y: auto;
+            border: 1px solid var(--ds-border-l2);
+            border-radius: 8px;
+        }
+        .subnet-splitter .subnet-table-wrap table { font-size: 13px; }
+        .subnet-splitter .subnet-table-wrap th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .subnet-splitter .subnet-table-wrap th,
+        .subnet-splitter .subnet-table-wrap td {
+            padding: 7px 10px;
             white-space: nowrap;
         }
-        .binary-section .bin-label {
-            display: inline-block;
-            min-width: 72px;
-            color: var(--text-muted);
-            font-size: 12px;
-            flex-shrink: 0;
+        .subnet-splitter .subnet-table-wrap th:first-child,
+        .subnet-splitter .subnet-table-wrap td:first-child {
+            width: 36px;
+            text-align: center;
         }
-        .binary-section .bin-value {
-            color: var(--text-primary);
+        .subnet-splitter .subnet-table-wrap td code {
+            font-size: 13px;
+            padding: 2px 6px;
         }
-        .binary-section .bin-dot {
-            color: var(--text-muted);
-        }
-        .bin-1 { color: var(--accent); font-weight: 600; }
-        .bin-0 { color: var(--text-muted); }
-        .bin-wild-1 { color: #0891b2; font-weight: 600; }
-        .bin-wild-0 { color: var(--text-muted); }
 
-        .binary-section .sep {
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px solid var(--border);
-        }
-        .binary-section .legend {
-            display: flex;
-            gap: 14px;
-            margin-top: 8px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .binary-section .legend span { display: flex; align-items: center; gap: 4px; }
-        .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
-
-        /* ===== 空状态 ===== */
+        /* ===== Empty State ===== */
         .empty-state {
             text-align: center;
-            padding: 32px 16px;
-            color: var(--text-muted);
-            font-size: 14px;
+            padding: 48px 16px;
+            color: var(--ds-description);
+            font-size: 15px;
         }
 
-        /* ===== 响应式 ===== */
-        @media (max-width: 500px) {
-            body { padding: 12px; }
-            .section { padding: 16px; }
-            .header { padding: 16px; }
-            .header h1 { font-size: 17px; }
+        /* ===== Toast ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: toast-in 0.2s ease, toast-out 0.25s ease 2s forwards;
+            pointer-events: auto;
+            max-width: 380px;
+        }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(8px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toast-out {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 0; transform: translateY(-4px) scale(0.97); }
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .ds-header-bar { padding: 0 16px; }
+            .ds-container { padding: 0 16px; }
+            .ds-page-title { padding: 24px 0 16px; }
+            .ds-page-title h1 { font-size: 26px; }
+            .ds-card { padding: 20px; border-radius: 8px; }
             .input-row { flex-direction: column; align-items: stretch; }
-            .input-row input { min-width: 0; }
-            .badge { align-self: flex-start; }
-            th, td { padding: 9px 8px; font-size: 13px; }
-            td code { font-size: 12px; }
+            .input-wrap { min-width: 0; }
+            .format-badge { align-self: flex-start; }
+            th, td { padding: 10px 10px; font-size: 13px; }
+            td code { font-size: 13px; }
+            .toast-container { bottom: 12px; right: 12px; left: 12px; }
+            .toast { max-width: 100%; }
+            
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="header">
-            <h1>IPv4 反掩码计算器</h1>
-            <p>支持 CIDR（192.168.10.0/23）、IP+掩码（192.168.136.0 255.255.252.0）、单主机</p>
+    <!-- ===== Header ===== -->
+    <div class="ds-header-wrapper">
+        <div class="ds-header-bar">
+            <a href="/">
+                <span class="ds-logo">
+                    <span class="ds-brand-dot"></span>
+                    CIDR 计算器
+                </span>
+            </a>
+            <div class="ds-header-actions">
+                <button id="themeToggle" class="theme-btn" aria-label="切换主题" title="切换主题">☀️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Main Content ===== -->
+    <div class="ds-container" role="application" aria-label="IPv4 CIDR 子网计算器">
+
+        <!-- Page Title -->
+        <div class="ds-page-title">
+            <h1>
+                <span class="ds-brand-text">IPv4</span> CIDR 子网计算器
+            </h1>
         </div>
 
-        <div class="section">
-            <label for="calcInput">输入网络 / 主机地址及掩码</label>
-            <div class="input-row">
-                <input type="text" id="calcInput" value="192.168.10.0/23"
-                       placeholder="例如 192.168.10.0/23"
-                       autocomplete="off" spellcheck="false">
-                <span id="formatBadge" class="badge">正在初始化…</span>
+        <!-- Input Card -->
+        <div class="ds-card">
+            <div class="ds-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                输入网络 / 主机地址及掩码
             </div>
-            <div id="inputError" class="error-msg"></div>
+            <div class="input-row">
+                <div class="input-wrap">
+                    <input type="text" id="calcInput" value="192.168.10.0/23"
+                           placeholder="例如 192.168.10.0/23"
+                           autocomplete="off" spellcheck="false"
+                           aria-describedby="formatBadge inputError">
+                    <button id="clearBtn" class="clear-btn" aria-label="清空输入" tabindex="-1">✕</button>
+                </div>
+                <span id="formatBadge" class="format-badge" role="status" aria-live="polite">正在初始化…</span>
+            </div>
+            <div id="inputError" class="error-msg" role="alert"></div>
 
-            <div class="presets">
+            <div class="presets" role="group" aria-label="快速预设">
                 <button type="button" data-value="0.0.0.0/0">0.0.0.0/0</button>
                 <button type="button" data-value="10.0.0.0/8">10.0.0.0/8</button>
                 <button type="button" data-value="172.16.0.0/12">172.16.0.0/12</button>
@@ -342,10 +674,17 @@
             </div>
         </div>
 
-        <div class="section">
-            <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 600;">计算结果</h3>
+        <!-- Results Card -->
+        <div class="ds-card">
+            <div class="ds-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                计算结果
+                <span id="resultBadge" class="result-badge" style="display:none;">CIDR</span>
+            </div>
             <div class="table-wrap">
-                <table>
+                <table aria-label="子网计算详情">
                     <thead>
                         <tr>
                             <th style="width: 34%;">计算条目</th>
@@ -353,87 +692,187 @@
                             <th style="width: 18%;">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="resultsContainer">
+                    <tbody id="resultsContainer" aria-live="polite" aria-relevant="additions">
                         <tr><td colspan="3" class="empty-state">等待输入…</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 二进制展开 -->
-            <div id="binarySection" class="binary-section" style="display: none;"></div>
+            <!-- Subnet Splitter -->
+            <div id="subnetSplitter" class="subnet-splitter" role="region" aria-label="子网拆分">
+                <div class="split-header">
+                    <label for="subnetSelect">子网拆分 · 目标掩码长度</label>
+                    <select id="subnetSelect"></select>
+                    <span id="splitCount" class="split-count"></span>
+                </div>
+                <div id="splitWarning" class="split-warning" style="display:none;"></div>
+                <div class="subnet-table-wrap">
+                    <table aria-label="子网列表">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>网络地址</th>
+                                <th>子网掩码</th>
+                                <th>广播地址</th>
+                                <th>可用范围</th>
+                                <th>主机数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subnetTbody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
+
+        </div>
+
+    <!-- ===== Toast ===== -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         'use strict';
 
-        // ===== 工具函数 =====
+        // ===== Theme =====
+
+        const $themeBtn = document.getElementById('themeToggle');
+
+        function getSystemDark() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        function getStoredTheme() {
+            try { return localStorage.getItem('dsh-cidr-theme'); } catch { return null; }
+        }
+        function setStoredTheme(v) {
+            try { if (v) localStorage.setItem('dsh-cidr-theme', v); else localStorage.removeItem('dsh-cidr-theme'); } catch {}
+        }
+        function applyTheme(dark) {
+            document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+            document.body.toggleAttribute('data-ds-dark-theme', dark);
+            $themeBtn.textContent = dark ? '☀️' : '🌙';
+            $themeBtn.setAttribute('aria-label', dark ? '切换到亮色主题' : '切换到暗色主题');
+        }
+        function resolveTheme() {
+            const stored = getStoredTheme();
+            if (stored === 'dark') return true;
+            if (stored === 'light') return false;
+            return getSystemDark();
+        }
+
+        $themeBtn.addEventListener('click', function () {
+            const isDark = document.body.hasAttribute('data-ds-dark-theme');
+            applyTheme(!isDark);
+            setStoredTheme(!isDark ? 'dark' : 'light');
+        });
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            if (!getStoredTheme()) applyTheme(e.matches);
+        });
+
+        applyTheme(resolveTheme());
+
+        // ===== Utilities =====
 
         function isValidIp(ip) {
             return /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip);
         }
-
         function ipToLong(ip) {
             const parts = ip.split('.');
             return ((+parts[0] << 24) | (+parts[1] << 16) | (+parts[2] << 8) | +parts[3]) >>> 0;
         }
-
         function longToIp(n) {
             return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
         }
-
         function cidrToLongMask(cidr) {
             return cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
         }
-
         function longMaskToCidr(mask) {
             const bin = mask.toString(2).padStart(32, '0');
             const firstZero = bin.indexOf('0');
             const lastOne = bin.lastIndexOf('1');
-            if (firstZero !== -1 && lastOne > firstZero) return -1; // 非连续掩码
+            if (firstZero !== -1 && lastOne > firstZero) return -1;
             return (bin.match(/1/g) || []).length;
         }
-
-        function toBinaryOctets(n) {
-            const octets = [];
-            for (let i = 0; i < 4; i++) {
-                octets.push(((n >>> (24 - i * 8)) & 255).toString(2).padStart(8, '0'));
-            }
-            return octets;
+        function toHex(n) {
+            return '0x' + n.toString(16).toUpperCase().padStart(8, '0');
         }
 
-        // ===== DOM 引用 =====
+        // ===== IP Classification =====
 
-        const $input      = document.getElementById('calcInput');
-        const $badge      = document.getElementById('formatBadge');
-        const $error      = document.getElementById('inputError');
-        const $container  = document.getElementById('resultsContainer');
-        const $binary     = document.getElementById('binarySection');
+        function classifyIp(ipNum) {
+            if ((ipNum >>> 24) === 0) return { label: '本网络', cls: 'reserved' };
+            if ((ipNum >>> 24) === 10) return { label: '私有地址 (A类)', cls: 'private' };
+            if ((ipNum >>> 24) === 127) return { label: '回环地址', cls: 'loopback' };
+            if ((ipNum >>> 16) === 0xA9FE) return { label: '链路本地地址', cls: 'link-local' };
+            if ((ipNum >>> 16) >= 0xAC10 && (ipNum >>> 16) <= 0xAC1F) return { label: '私有地址 (B类)', cls: 'private' };
+            if ((ipNum >>> 16) === 0xC0A8) return { label: '私有地址 (C类)', cls: 'private' };
+            if ((ipNum >>> 28) >= 0xE && (ipNum >>> 28) <= 0xEF) return { label: '多播地址', cls: 'multicast' };
+            if ((ipNum >>> 28) >= 0xF0) return { label: '保留地址', cls: 'reserved' };
+            return { label: '公网地址', cls: 'public' };
+        }
 
-        // ===== 核心逻辑 =====
+        // ===== Debounce =====
+
+        function debounce(fn, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        // ===== DOM References =====
+
+        const $input          = document.getElementById('calcInput');
+        const $clearBtn       = document.getElementById('clearBtn');
+        const $badge          = document.getElementById('formatBadge');
+        const $error          = document.getElementById('inputError');
+        const $container      = document.getElementById('resultsContainer');
+        const $splitter       = document.getElementById('subnetSplitter');
+        const $subnetSelect   = document.getElementById('subnetSelect');
+        const $splitCount     = document.getElementById('splitCount');
+        const $splitWarning   = document.getElementById('splitWarning');
+        const $subnetTbody    = document.getElementById('subnetTbody');
+        const $toastContainer = document.getElementById('toastContainer');
+        const $resultBadge    = document.getElementById('resultBadge');
+
+        // ===== Toast =====
+
+        function showToast(message) {
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = message;
+            $toastContainer.appendChild(el);
+            setTimeout(() => {
+                if (el.parentNode) el.remove();
+            }, 2500);
+        }
+
+        // ===== Core Logic =====
 
         function processInput() {
             $error.style.display = 'none';
+            $resultBadge.style.display = 'none';
 
-            const raw = $input.value.trim().replace(/\s+/g, ' ');
+            const raw = $input.value.trim();
+            $clearBtn.classList.toggle('visible', raw.length > 0);
 
-            // 空输入
             if (!raw) {
                 renderEmpty();
                 $badge.textContent = '等待输入';
                 $badge.style.cssText = '';
-                $binary.style.display = 'none';
+                $splitter.classList.remove('visible');
                 return;
             }
+
+            const normalized = raw.replace(/\s+/g, ' ');
 
             let ipStr = '';
             let maskNum = 0;
             let cidr = 0;
             let matched = false;
 
-            // 1. CIDR 格式
-            if (raw.includes('/')) {
-                const parts = raw.split('/');
+            if (normalized.includes('/')) {
+                const parts = normalized.split('/');
                 const ip = parts[0].trim();
                 const cidrStr = parts[1].trim();
                 if (isValidIp(ip) && cidrStr !== '' && !isNaN(cidrStr)) {
@@ -448,9 +887,8 @@
                     }
                 }
             }
-            // 2. IP + 掩码
-            else if (raw.includes(' ')) {
-                const parts = raw.split(' ');
+            else if (normalized.includes(' ')) {
+                const parts = normalized.split(' ');
                 const ip = parts[0].trim();
                 const mask = parts[1].trim();
                 if (isValidIp(ip) && isValidIp(mask)) {
@@ -459,8 +897,8 @@
                     cidr = longMaskToCidr(maskNum);
                     if (cidr === -1) {
                         $badge.textContent = '⚠ 非连续掩码';
-                        $badge.style.background = 'var(--badge-warn-bg)';
-                        $badge.style.color   = 'var(--badge-warn-text)';
+                        $badge.style.background = 'var(--warn-bg)';
+                        $badge.style.color   = 'var(--warn-text)';
                     } else {
                         $badge.textContent = '掩码 /' + cidr;
                         $badge.style.background = 'var(--success-bg)';
@@ -469,9 +907,8 @@
                     matched = true;
                 }
             }
-            // 3. 纯 IP
-            else if (isValidIp(raw)) {
-                ipStr = raw;
+            else if (isValidIp(normalized)) {
+                ipStr = normalized;
                 cidr = 32;
                 maskNum = cidrToLongMask(32);
                 $badge.textContent = '主机 /32';
@@ -482,7 +919,6 @@
             if (matched) {
                 renderResults(ipStr, maskNum, cidr);
             } else {
-                // 输入长度 > 4 才报错（避免刚输入一个字符就弹红）
                 if (raw.length > 4) {
                     $error.style.display = 'block';
                     $error.textContent = '⚠ 输入格式有误。请使用 CIDR（如 192.168.10.0/23）或 IP+掩码（如 192.168.10.0 255.255.255.0）';
@@ -490,15 +926,19 @@
                     $badge.style.background = 'var(--error-bg)';
                     $badge.style.color   = 'var(--error-text)';
                 }
-                $binary.style.display = 'none';
+                $splitter.classList.remove('visible');
             }
         }
+
+        const debouncedProcess = debounce(processInput, 80);
 
         function renderResults(ipStr, maskNum, cidr) {
             const ipNum = ipToLong(ipStr);
             const wildcardNum = (~maskNum) >>> 0;
             const networkNum = (ipNum & maskNum) >>> 0;
             const broadcastNum = (networkNum | wildcardNum) >>> 0;
+
+            const classification = classifyIp(ipNum);
 
             let usableHosts, hostRange;
 
@@ -512,88 +952,151 @@
                 usableHosts = Math.pow(2, 32 - cidr) - 2;
                 hostRange = longToIp(networkNum + 1) + ' — ' + longToIp(broadcastNum - 1);
             } else {
-                // 非连续掩码
                 usableHosts = 'N/A';
                 hostRange = '非连续掩码，无法确定';
             }
 
-            const acl = 'permit ' + longToIp(networkNum) + ' ' + longToIp(wildcardNum);
+            const hexStr = 'IP: ' + toHex(ipNum) + '　掩码: ' + toHex(maskNum);
 
             const rows = [
-                { label: '分析 IP 地址',          value: ipStr },
+                { label: '分析 IP 地址',          value: ipStr,              extra: classification },
                 { label: '子网掩码（Subnet Mask）',  value: longToIp(maskNum) },
                 { label: '反掩码（Wildcard Mask）',  value: longToIp(wildcardNum) },
                 { label: '网络地址（Network ID）',   value: longToIp(networkNum) },
                 { label: '广播地址（Broadcast）',    value: longToIp(broadcastNum) },
                 { label: '可用主机范围',            value: hostRange },
                 { label: '可用主机总数',            value: typeof usableHosts === 'number' ? usableHosts.toLocaleString() : usableHosts },
-                { label: 'Cisco ACL 参考',          value: acl },
+                { label: '十六进制表示',            value: hexStr },
             ];
 
-            // 渲染表格
+            // Update result badge
+            $resultBadge.style.display = 'inline-flex';
+            $resultBadge.textContent = cidr >= 0 ? '/' + cidr + ' · ' + rows[0].extra.label : 'N/A';
+
             $container.innerHTML = '';
             for (const row of rows) {
                 const tr = document.createElement('tr');
+                let valueHtml = '<code>' + escHtml(row.value) + '</code>';
+                if (row.extra) {
+                    valueHtml += ' <span class="ip-class ' + row.extra.cls + '">' + row.extra.label + '</span>';
+                }
                 tr.innerHTML =
                     '<td>' + escHtml(row.label) + '</td>' +
-                    '<td><code>' + escHtml(row.value) + '</code></td>' +
-                    '<td><button class="copy-btn" data-copy="' + escAttr(row.value) + '">复制</button></td>';
+                    '<td>' + valueHtml + '</td>' +
+                    '<td><button class="copy-btn" data-copy="' + escAttr(row.value) + '" aria-label="复制 ' + escAttr(row.label) + '">复制</button></td>';
                 $container.appendChild(tr);
             }
 
-            // 绑定复制按钮
-            $container.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    copyText(this.getAttribute('data-copy'), this);
-                });
-            });
-
-            // 二进制展开
-            renderBinary(ipNum, maskNum, wildcardNum, networkNum, broadcastNum, cidr);
+            renderSubnetSplitter(networkNum, cidr);
         }
 
-        function renderBinary(ipNum, maskNum, wildcardNum, networkNum, broadcastNum, cidr) {
-            const ipOct = toBinaryOctets(ipNum);
-            const mkOct = toBinaryOctets(maskNum);
-            const wcOct = toBinaryOctets(wildcardNum);
-            const nwOct = toBinaryOctets(networkNum);
-            const bcOct = toBinaryOctets(broadcastNum);
+        // ===== Event Delegation: Copy Buttons =====
 
-            function colorizeBin(octets, clsOne, clsZero) {
-                return octets.map(oct =>
-                    [...oct].map(b => `<span class="${b === '1' ? clsOne : clsZero}">${b}</span>`).join('')
-                ).join('<span class="bin-dot">.</span>');
+        $container.addEventListener('click', function (e) {
+            const btn = e.target.closest('.copy-btn');
+            if (btn) {
+                const text = btn.getAttribute('data-copy');
+                if (text !== null) {
+                    copyText(text, btn);
+                }
+            }
+        });
+
+        // ===== Subnet Splitter =====
+
+        const DISPLAY_LIMIT = 512;
+
+        function renderSubnetSplitter(networkNum, parentCidr) {
+            if (parentCidr < 0 || parentCidr >= 32) {
+                $splitter.classList.remove('visible');
+                return;
             }
 
-            const ipBin   = colorizeBin(ipOct, 'bin-1', 'bin-0');
-            const mkBin   = colorizeBin(mkOct, 'bin-1', 'bin-0');
-            const wcBin   = colorizeBin(wcOct, 'bin-wild-1', 'bin-wild-0');
-            const nwBin   = colorizeBin(nwOct, 'bin-1', 'bin-0');
-            const bcBin   = colorizeBin(bcOct, 'bin-1', 'bin-0');
+            const current = parseInt($subnetSelect.value, 10) || (parentCidr + 1);
+            $subnetSelect.innerHTML = '';
+            for (let i = parentCidr + 1; i <= 32; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = '/' + i;
+                if (i === current) opt.selected = true;
+                $subnetSelect.appendChild(opt);
+            }
 
-            const cidrLabel = cidr >= 0 && cidr <= 32 ? '  (/' + cidr + ')' : '';
-
-            $binary.innerHTML =
-                '<div class="bin-row"><span class="bin-label">IP</span>'        + '<span class="bin-value">' + ipBin + '</span></div>' +
-                '<div class="bin-row"><span class="bin-label">掩码</span>'       + '<span class="bin-value">' + mkBin + cidrLabel + '</span></div>' +
-                '<div class="bin-row"><span class="bin-label">反掩码</span>'     + '<span class="bin-value">' + wcBin + '</span></div>' +
-                '<div class="bin-row sep"><span class="bin-label">网络地址</span>' + '<span class="bin-value">' + nwBin + '</span></div>' +
-                '<div class="bin-row"><span class="bin-label">广播地址</span>'    + '<span class="bin-value">' + bcBin + '</span></div>' +
-                '<div class="legend">' +
-                    '<span><span class="legend-dot" style="background:var(--accent);"></span> 网络位（1）</span>' +
-                    '<span><span class="legend-dot" style="background:var(--text-muted);"></span> 主机位（0）</span>' +
-                    '<span><span class="legend-dot" style="background:#0891b2;"></span> 反掩码 1</span>' +
-                '</div>';
-
-            $binary.style.display = '';
+            targetCidr = parseInt($subnetSelect.value, 10);
+            fillSubnetTable(networkNum, parentCidr, targetCidr);
+            $splitter.classList.add('visible');
         }
+
+        let targetCidr = 0;
+
+        $subnetSelect.addEventListener('change', function () {
+            const networkNum = window._lastNetworkNum;
+            const parentCidr = window._lastParentCidr;
+            if (networkNum !== undefined && parentCidr !== undefined) {
+                targetCidr = parseInt($subnetSelect.value, 10);
+                fillSubnetTable(networkNum, parentCidr, targetCidr);
+            }
+        });
+
+        function fillSubnetTable(networkNum, parentCidr, targetCidr) {
+            if (targetCidr <= parentCidr) {
+                $subnetTbody.innerHTML = '';
+                $splitCount.textContent = '';
+                $splitWarning.style.display = 'none';
+                return;
+            }
+
+            const step = Math.pow(2, 32 - targetCidr);
+            const total = Math.pow(2, targetCidr - parentCidr);
+            const targetMask = cidrToLongMask(targetCidr);
+
+            $splitCount.innerHTML = '共 <strong>' + total.toLocaleString() + '</strong> 个子网';
+
+            const limited = total > DISPLAY_LIMIT;
+            if (limited) {
+                $splitWarning.style.display = 'block';
+                $splitWarning.textContent = '⚠ 子网数量过多（' + total.toLocaleString() + ' 个），仅显示前 ' + DISPLAY_LIMIT.toLocaleString() + ' 个。';
+            } else {
+                $splitWarning.style.display = 'none';
+            }
+
+            const limit = Math.min(total, DISPLAY_LIMIT);
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < limit; i++) {
+                const addr = networkNum + i * step;
+                const broadcast = addr + step - 1;
+                const hosts = targetCidr === 32 ? 1
+                            : targetCidr === 31 ? 2
+                            : Math.pow(2, 32 - targetCidr) - 2;
+                const range = targetCidr >= 31
+                    ? longToIp(addr) + ' — ' + longToIp(broadcast)
+                    : longToIp(addr + 1) + ' — ' + longToIp(broadcast - 1);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><code>' + longToIp(addr) + '</code></td>' +
+                    '<td><code>' + longToIp(targetMask) + '</code></td>' +
+                    '<td><code>' + longToIp(broadcast) + '</code></td>' +
+                    '<td><code>' + range + '</code></td>' +
+                    '<td>' + hosts.toLocaleString() + '</td>';
+                fragment.appendChild(tr);
+            }
+
+            $subnetTbody.innerHTML = '';
+            $subnetTbody.appendChild(fragment);
+        }
+
+        // ===== Empty State =====
 
         function renderEmpty() {
             $container.innerHTML = '<tr><td colspan="3" class="empty-state">输入 IP 地址后自动计算结果</td></tr>';
-            $binary.style.display = 'none';
+            $splitter.classList.remove('visible');
+            $resultBadge.style.display = 'none';
         }
 
-        // ===== 辅助：转义 =====
+        // ===== Escaping =====
 
         function escHtml(s) {
             const div = document.createElement('div');
@@ -602,43 +1105,42 @@
         }
 
         function escAttr(s) {
-            return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            return s.replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
         }
 
-        // ===== 复制 =====
+        // ===== Copy =====
 
         function copyText(text, btn) {
-            if (!navigator.clipboard) {
-                // fallback
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                flashCopied(btn);
-                return;
-            }
-            navigator.clipboard.writeText(text).then(() => flashCopied(btn));
+            const doCopy = () => {
+                if (!navigator.clipboard) {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return Promise.resolve(true);
+                }
+                return navigator.clipboard.writeText(text).then(() => true);
+            };
+
+            doCopy().then(() => {
+                showToast('✅ 已复制: ' + text);
+            }).catch(() => {
+                showToast('❌ 复制失败');
+            });
         }
 
-        function flashCopied(btn) {
-            btn.textContent = '已复制';
-            btn.classList.add('copied');
-            setTimeout(() => {
-                btn.textContent = '复制';
-                btn.classList.remove('copied');
-            }, 1000);
-        }
+        // ===== Event Binding =====
 
-        // ===== 事件绑定 =====
+        $input.addEventListener('input', debouncedProcess);
 
-        // 输入实时计算
-        $input.addEventListener('input', processInput);
-
-        // 回车键
         $input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -646,7 +1148,12 @@
             }
         });
 
-        // 预设按钮
+        $clearBtn.addEventListener('click', function () {
+            $input.value = '';
+            $input.focus();
+            processInput();
+        });
+
         document.querySelectorAll('.presets button').forEach(btn => {
             btn.addEventListener('click', function () {
                 $input.value = this.getAttribute('data-value');
@@ -655,7 +1162,15 @@
             });
         });
 
-        // 初始计算
+        const _origRenderResults = renderResults;
+        renderResults = function (ipStr, maskNum, cidr) {
+            const ipNum = ipToLong(ipStr);
+            const networkNum = (ipNum & maskNum) >>> 0;
+            window._lastNetworkNum = networkNum;
+            window._lastParentCidr = cidr;
+            _origRenderResults.call(this, ipStr, maskNum, cidr);
+        };
+
         processInput();
     </script>
 </body>
